@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { AwesomeButton } from 'react-awesome-button';
 import { useAccount, useConnect, usePrepareContractWrite, useContractWrite } from 'wagmi';
 import { ethers } from 'ethers';
 import { RewardButtonProps, RewardButtonState, TokenInfo } from './types';
@@ -8,17 +9,22 @@ const RewardButton: React.FC<RewardButtonProps> = ({
   tokenAddress,
   rewardAmount,
   recipientAddress,
-  children = 'Claim Reward',
+  children = 'Button',
   className = '',
   style = {},
+  onPress,
   onRewardClaimed,
   onRewardFailed,
   onRewardStarted,
   disabled = false,
-  loadingText = 'Claiming...',
+  loadingText = 'Loading...',
   showRewardAmount = true,
   tokenSymbol = 'TOKEN',
   requireConnection = true,
+  type = 'primary',
+  size = 'medium',
+  ripple = false,
+  ...awesomeButtonProps
 }) => {
   const [state, setState] = useState<RewardButtonState>({
     isLoading: false,
@@ -26,27 +32,31 @@ const RewardButton: React.FC<RewardButtonProps> = ({
     tokenInfo: null,
   });
 
+  // Determine if this is a reward button or regular button
+  const isRewardMode = Boolean(tokenAddress && rewardAmount);
+
+  // Only use wagmi hooks if in reward mode
   const { address, isConnected } = useAccount();
   const { connect, connectors } = useConnect();
 
-  // Determine the target address for the reward
-  const targetAddress = recipientAddress || address || '0x742d35Cc6634C0532925a3b8D25c8c5c8A2B9E6D';
+  // Determine the target address for the reward (only relevant in reward mode)
+  const targetAddress = isRewardMode ? (recipientAddress || address || '0x742d35Cc6634C0532925a3b8D25c8c5c8A2B9E6D') : undefined;
 
-  // Prepare the contract write for token transfer
+  // Prepare the contract write for token transfer (only if in reward mode)
   const { config: contractWriteConfig } = usePrepareContractWrite({
     address: tokenAddress as `0x${string}`,
     abi: ERC20_ABI,
     functionName: 'transfer',
-    args: [targetAddress as `0x${string}`, BigInt(rewardAmount)],
-    enabled: Boolean(targetAddress && rewardAmount && tokenAddress && isConnected),
+    args: [targetAddress as `0x${string}`, BigInt(rewardAmount || '0')],
+    enabled: Boolean(isRewardMode && targetAddress && rewardAmount && tokenAddress && isConnected),
   });
 
-  // Contract write hook for executing the transaction
+  // Contract write hook for executing the transaction (only if in reward mode)
   const { write: executeTransfer, isLoading: isTransactionLoading } = useContractWrite({
     ...contractWriteConfig,
     onSuccess: (data) => {
       setState(prev => ({ ...prev, isLoading: false, error: null }));
-      onRewardClaimed?.(data.hash, rewardAmount);
+      onRewardClaimed?.(data.hash, rewardAmount || '0');
     },
     onError: (error) => {
       setState(prev => ({ ...prev, isLoading: false, error: error.message }));
@@ -54,8 +64,10 @@ const RewardButton: React.FC<RewardButtonProps> = ({
     },
   });
 
-  // Fetch token information
+  // Fetch token information (only if in reward mode)
   useEffect(() => {
+    if (!isRewardMode) return;
+
     const fetchTokenInfo = async () => {
       if (!tokenAddress) return;
 
@@ -84,7 +96,7 @@ const RewardButton: React.FC<RewardButtonProps> = ({
     };
 
     fetchTokenInfo();
-  }, [tokenAddress, tokenSymbol]);
+  }, [tokenAddress, tokenSymbol, isRewardMode]);
 
   const handleClaimReward = async () => {
     try {
@@ -108,7 +120,7 @@ const RewardButton: React.FC<RewardButtonProps> = ({
         setTimeout(() => {
           const mockTxHash = '0x' + Math.random().toString(16).substr(2, 64);
           setState(prev => ({ ...prev, isLoading: false, error: null }));
-          onRewardClaimed?.(mockTxHash, rewardAmount);
+          onRewardClaimed?.(mockTxHash, rewardAmount || '0');
         }, 2000);
       }
 
@@ -123,6 +135,15 @@ const RewardButton: React.FC<RewardButtonProps> = ({
     }
   };
 
+  const handleButtonPress = (event: React.MouseEvent<HTMLButtonElement>) => {
+    if (isRewardMode) {
+      handleClaimReward();
+    } else {
+      // Regular button mode - call the onPress handler
+      onPress?.(event);
+    }
+  };
+
   const formatAmount = (amount: string, decimals: number = 18): string => {
     try {
       return ethers.formatUnits(amount, decimals);
@@ -131,41 +152,18 @@ const RewardButton: React.FC<RewardButtonProps> = ({
     }
   };
 
-  const isButtonLoading = state.isLoading || isTransactionLoading;
+  const isButtonLoading = isRewardMode ? (state.isLoading || isTransactionLoading) : false;
   const isButtonDisabled = disabled || isButtonLoading;
 
-  // Default styles with signature shine effect
-  const defaultButtonStyles: React.CSSProperties = {
+  // Enhanced style for reward buttons with shine effect
+  const rewardButtonStyle: React.CSSProperties = {
     position: 'relative',
     overflow: 'hidden',
-    border: 'none',
-    padding: '12px 24px',
-    fontSize: '16px',
-    fontWeight: 'bold',
-    borderRadius: '8px',
-    cursor: isButtonDisabled ? 'not-allowed' : 'pointer',
-    background: '#3b82f6',
-    color: 'white',
-    opacity: isButtonDisabled ? 0.6 : 1,
-    transition: 'all 0.2s ease',
-    minWidth: '200px',
-    minHeight: '48px',
     ...style,
   };
 
-  // Shine effect styles
-  const shineEffectStyles: React.CSSProperties = {
-    position: 'absolute',
-    top: 0,
-    left: '-100%',
-    width: '100%',
-    height: '100%',
-    background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.4), transparent)',
-    pointerEvents: 'none',
-    animation: isButtonDisabled ? 'none' : 'rewardButtonShine 3s infinite',
-  };
-
-  return (
+  // Shine effect styles (only applied in reward mode)
+  const shineOverlay = isRewardMode ? (
     <>
       <style>
         {`
@@ -173,51 +171,72 @@ const RewardButton: React.FC<RewardButtonProps> = ({
             0% { left: -100%; }
             100% { left: 100%; }
           }
-          .reward-button-shine:hover .reward-button-shine-effect {
-            animation: rewardButtonShine 1.5s infinite !important;
+          .reward-button-shine::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.4), transparent);
+            pointer-events: none;
+            animation: ${isButtonDisabled ? 'none' : 'rewardButtonShine 3s infinite'};
+            z-index: 1;
+          }
+          .reward-button-shine:hover::before {
+            animation: ${isButtonDisabled ? 'none' : 'rewardButtonShine 1.5s infinite'};
           }
         `}
       </style>
-      <button
-        className={`reward-button reward-button-shine ${className}`}
-        style={defaultButtonStyles}
-        onClick={handleClaimReward}
-        disabled={isButtonDisabled}
-        type="button"
-      >
-        <div
-          style={shineEffectStyles}
-          className="reward-button-shine-effect"
-        />
-        {isButtonLoading ? (
-          <span style={{ position: 'relative', zIndex: 1 }}>{loadingText}</span>
-        ) : (
-          <span style={{ position: 'relative', zIndex: 1 }}>
-            {children}
-            {showRewardAmount && state.tokenInfo && (
-              <span style={{ display: 'block', fontSize: '14px', opacity: 0.9, marginTop: '4px' }}>
-                ({formatAmount(rewardAmount, state.tokenInfo.decimals)} {state.tokenInfo.symbol})
-              </span>
-            )}
-          </span>
-        )}
-        
-        {state.error && (
-          <div style={{ 
-            fontSize: '12px', 
-            color: '#fecaca', 
-            marginTop: '4px',
-            background: 'rgba(239, 68, 68, 0.1)',
-            border: '1px solid #ef4444',
-            borderRadius: '4px',
-            padding: '6px 8px',
-            position: 'relative',
-            zIndex: 1
-          }}>
-            {state.error}
+      <div style={{ position: 'relative', zIndex: 2 }}>
+        {children}
+        {showRewardAmount && state.tokenInfo && (
+          <div style={{ fontSize: '12px', opacity: 0.9, marginTop: '4px' }}>
+            ({formatAmount(rewardAmount || '0', state.tokenInfo.decimals)} {state.tokenInfo.symbol})
           </div>
         )}
-      </button>
+      </div>
+    </>
+  ) : children;
+
+  // Create safe props object for AwesomeButton
+  const safeAwesomeButtonProps = {
+    type: isRewardMode ? 'primary' : (type || 'secondary'),
+    size: size,
+    className: `${isRewardMode ? 'reward-button-shine' : ''} ${className}`,
+    style: isRewardMode ? rewardButtonStyle : style,
+    onPress: handleButtonPress,
+    disabled: isButtonDisabled,
+    ripple: isRewardMode ? true : ripple,
+    // Only pass safe props
+    href: awesomeButtonProps.href,
+    target: awesomeButtonProps.target,
+    visible: awesomeButtonProps.visible,
+    placeholder: awesomeButtonProps.placeholder,
+    before: awesomeButtonProps.before,
+    after: awesomeButtonProps.after,
+    active: awesomeButtonProps.active,
+  };
+
+  return (
+    <>
+      <AwesomeButton {...safeAwesomeButtonProps}>
+        {isButtonLoading ? loadingText : shineOverlay}
+      </AwesomeButton>
+      
+      {isRewardMode && state.error && (
+        <div style={{ 
+          fontSize: '12px', 
+          color: '#ef4444', 
+          marginTop: '8px',
+          background: 'rgba(239, 68, 68, 0.1)',
+          border: '1px solid #ef4444',
+          borderRadius: '4px',
+          padding: '6px 8px',
+        }}>
+          {state.error}
+        </div>
+      )}
     </>
   );
 };

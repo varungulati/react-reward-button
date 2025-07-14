@@ -5,6 +5,7 @@ import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RewardButton } from 'react-reward-button';
 import { ethers } from 'ethers';
+import 'react-awesome-button/dist/styles.css';
 import './App.css';
 
 // Create a query client for React Query
@@ -57,18 +58,73 @@ function App() {
     console.log('Reward transaction started');
   };
 
+  const handleRegularButtonPress = () => {
+    console.log('Regular button pressed!');
+    alert('This is a regular AwesomeButton press!');
+  };
+
+  const handleCustomButtonPress = () => {
+    console.log('Custom button pressed!');
+    alert('This is a custom styled AwesomeButton!');
+  };
+
   return (
     <WagmiConfig config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <div className="App">
           <header className="App-header">
             <h1>React Reward Button Example</h1>
-            <p>A simple example demonstrating the RewardButton component</p>
+            <p>Built on top of react-awesome-button with reward functionality</p>
           </header>
 
           <main className="App-main">
             <div className="example-section">
-              <h2>USDC Reward Button</h2>
+              <h2>Regular AwesomeButton Mode</h2>
+              <p>When no reward props are provided, it behaves like a regular AwesomeButton</p>
+              <RewardButton 
+                type="secondary" 
+                size="medium" 
+                ripple={true}
+                onPress={handleRegularButtonPress}
+              >
+                Click Me!
+              </RewardButton>
+            </div>
+
+            <div className="example-section">
+              <h2>Custom AwesomeButton Features</h2>
+              <p>Access all AwesomeButton features: types, sizes, ripple effects</p>
+              <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                <RewardButton 
+                  type="primary" 
+                  size="small" 
+                  ripple={true}
+                  onPress={handleCustomButtonPress}
+                >
+                  Primary Small
+                </RewardButton>
+                <RewardButton 
+                  type="secondary" 
+                  size="medium" 
+                  ripple={true}
+                  onPress={handleCustomButtonPress}
+                >
+                  Secondary Medium
+                </RewardButton>
+                <RewardButton 
+                  type="primary" 
+                  size="large" 
+                  ripple={true}
+                  onPress={handleCustomButtonPress}
+                >
+                  Primary Large
+                </RewardButton>
+              </div>
+            </div>
+
+            <div className="example-section">
+              <h2>Reward Button Mode</h2>
+              <p>When reward props are provided, it becomes a reward button with shine effect</p>
               <RewardButton
                 tokenAddress={EXAMPLE_TOKENS.USDC}
                 rewardAmount={ethers.parseUnits('10', 6).toString()}
@@ -78,25 +134,97 @@ function App() {
                 onRewardStarted={handleRewardStarted}
                 tokenSymbol="USDC"
                 requireConnection={false}
+                type="primary"
+                size="medium"
+                ripple={true}
               >
-                Claim 10 USDC
+                Claim 10 USDC Reward
               </RewardButton>
             </div>
 
             <div className="example-section">
-              <h2>USDT Reward Button</h2>
-              <RewardButton
-                tokenAddress={EXAMPLE_TOKENS.USDT}
-                rewardAmount={ethers.parseUnits('5', 6).toString()}
-                recipientAddress="0x742d35Cc6634C0532925a3b8D25c8c5c8A2B9E6D"
-                onRewardClaimed={handleRewardClaimed}
-                onRewardFailed={handleRewardFailed}
-                onRewardStarted={handleRewardStarted}
-                tokenSymbol="USDT"
-                requireConnection={false}
-              >
-                Claim 5 USDT
-              </RewardButton>
+              <h2>Multiple Reward Buttons</h2>
+              <p>Different reward buttons with various tokens and styles</p>
+              <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                <RewardButton
+                  tokenAddress={EXAMPLE_TOKENS.USDT}
+                  rewardAmount={ethers.parseUnits('5', 6).toString()}
+                  recipientAddress="0x742d35Cc6634C0532925a3b8D25c8c5c8A2B9E6D"
+                  onRewardClaimed={handleRewardClaimed}
+                  onRewardFailed={handleRewardFailed}
+                  onRewardStarted={handleRewardStarted}
+                  tokenSymbol="USDT"
+                  requireConnection={false}
+                  type="primary"
+                  size="small"
+                >
+                  Claim 5 USDT
+                </RewardButton>
+                <RewardButton
+                  tokenAddress={EXAMPLE_TOKENS.DAI}
+                  rewardAmount={ethers.parseUnits('20', 18).toString()}
+                  recipientAddress="0x742d35Cc6634C0532925a3b8D25c8c5c8A2B9E6D"
+                  onRewardClaimed={handleRewardClaimed}
+                  onRewardFailed={handleRewardFailed}
+                  onRewardStarted={handleRewardStarted}
+                  tokenSymbol="DAI"
+                  requireConnection={false}
+                  type="primary"
+                  size="large"
+                >
+                  Claim 20 DAI
+                </RewardButton>
+              </div>
+            </div>
+
+            <div className="example-section">
+              <h2>Disabled States</h2>
+              <p>Both regular and reward buttons can be disabled</p>
+              <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                <RewardButton 
+                  disabled 
+                  type="secondary" 
+                  onPress={handleRegularButtonPress}
+                >
+                  Disabled Regular
+                </RewardButton>
+                <RewardButton 
+                  disabled
+                  tokenAddress={EXAMPLE_TOKENS.USDC}
+                  rewardAmount={ethers.parseUnits('10', 6).toString()}
+                  tokenSymbol="USDC"
+                  requireConnection={false}
+                  type="primary"
+                >
+                  Disabled Reward
+                </RewardButton>
+              </div>
+            </div>
+
+            <div className="example-section">
+              <h2>The Shine Effect</h2>
+              <p>Notice how reward buttons have a signature shine effect that regular buttons don't have</p>
+              <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                <RewardButton 
+                  type="primary" 
+                  size="medium" 
+                  ripple={true}
+                  onPress={handleRegularButtonPress}
+                >
+                  No Shine (Regular)
+                </RewardButton>
+                <RewardButton
+                  tokenAddress={EXAMPLE_TOKENS.USDC}
+                  rewardAmount={ethers.parseUnits('1', 6).toString()}
+                  tokenSymbol="USDC"
+                  requireConnection={false}
+                  type="primary"
+                  size="medium"
+                  ripple={true}
+                >
+                  Has Shine (Reward)
+                </RewardButton>
+              </div>
             </div>
           </main>
         </div>
