@@ -1,24 +1,18 @@
 .App {
   text-align: center;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
   padding: 20px;
 }
 
 .App-header {
-  padding: 40px 20px;
+  padding: 20px;
 }
 
 .App-header h1 {
-  font-size: 3rem;
-  margin-bottom: 20px;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  margin-bottom: 10px;
 }
 
 .App-header p {
-  font-size: 1.2rem;
-  opacity: 0.9;
+  margin-bottom: 20px;
 }
 
 .App-main {
@@ -28,262 +22,10 @@
 }
 
 .example-section {
-  margin-bottom: 60px;
-  padding: 30px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 40px;
+  padding: 20px;
 }
 
 .example-section h2 {
-  font-size: 2rem;
-  margin-bottom: 30px;
-  color: white;
-}
-
-/* Reward Button Styling */
-.reward-button {
-  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-  color: white;
-  border: none;
-  padding: 15px 30px;
-  font-size: 18px;
-  font-weight: bold;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-  min-width: 250px;
-  min-height: 60px;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Signature Shine Effect for Reward Buttons */
-.reward-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.4),
-    rgba(255, 255, 255, 0.6),
-    rgba(255, 255, 255, 0.4),
-    transparent
-  );
-  animation: shine 3s infinite;
-  pointer-events: none;
-}
-
-@keyframes shine {
-  0% {
-    left: -100%;
-  }
-  100% {
-    left: 100%;
-  }
-}
-
-/* Pause animation when button is disabled or loading */
-.reward-button:disabled::before {
-  animation-play-state: paused;
-}
-
-/* Faster shine on hover */
-.reward-button:hover:not(:disabled)::before {
-  animation: shine 1.5s infinite;
-}
-
-.reward-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
-  background: linear-gradient(135deg, #ff5252, #d32f2f);
-}
-
-.reward-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  background: #666;
-}
-
-.reward-button-primary {
-  background: linear-gradient(135deg, #4f46e5, #3730a3);
-}
-
-.reward-button-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #3730a3, #1e1b4b);
-}
-
-.reward-button-secondary {
-  background: linear-gradient(135deg, #10b981, #047857);
-}
-
-.reward-button-secondary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #047857, #065f46);
-}
-
-.reward-amount {
-  display: block;
-  font-size: 14px;
-  opacity: 0.9;
-  margin-top: 5px;
-}
-
-.reward-button-error {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid #ef4444;
-  border-radius: 6px;
-  padding: 8px 12px;
-  margin-top: 8px;
-  font-size: 12px;
-  color: #fecaca;
-}
-
-.examples-section {
-  margin-bottom: 3rem;
-}
-
-.examples-section h2 {
-  font-size: 2rem;
-  margin-bottom: 2rem;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-}
-
-.example-card {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 15px;
-  padding: 2rem;
-  margin: 1.5rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.example-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-}
-
-.example-card h3 {
-  color: #ffd700;
-  margin-bottom: 0.5rem;
-  font-size: 1.5rem;
-}
-
-.example-card p {
-  margin-bottom: 1.5rem;
-  opacity: 0.9;
-}
-
-.custom-reward-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4) !important;
-}
-
-.info-section {
-  margin-bottom: 2rem;
-}
-
-.info-section h2 {
-  font-size: 1.8rem;
-  margin-bottom: 1.5rem;
-  color: #ffd700;
-}
-
-.code-example {
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 10px;
-  padding: 1.5rem;
-  margin: 1rem 0;
-  text-align: left;
-  overflow-x: auto;
-}
-
-.code-example pre {
-  margin: 0;
-  font-family: 'Courier New', monospace;
-  font-size: 0.9rem;
-  line-height: 1.4;
-}
-
-.code-example code {
-  color: #e6e6e6;
-}
-
-.info-section ul {
-  text-align: left;
-  max-width: 600px;
-  margin: 0 auto;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  padding: 1.5rem;
-  backdrop-filter: blur(5px);
-}
-
-.info-section li {
-  margin-bottom: 0.5rem;
-  opacity: 0.9;
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-  .App-header h1 {
-    font-size: 2rem;
-  }
-  
-  .App-header p {
-    font-size: 1rem;
-  }
-  
-  .example-card {
-    margin: 1rem 0;
-    padding: 1.5rem;
-  }
-  
-  .App-main {
-    padding: 0 1rem 2rem;
-  }
-  
-  .code-example {
-    font-size: 0.8rem;
-  }
-}
-
-/* Custom styles for reward button states */
-.reward-button--loading {
-  animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-.reward-button--claimed {
-  animation: success 0.5s ease-in-out;
-}
-
-@keyframes success {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
-  }
+  margin-bottom: 20px;
 } 

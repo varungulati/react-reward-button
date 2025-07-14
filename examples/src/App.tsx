@@ -77,7 +77,6 @@ function App() {
                 onRewardFailed={handleRewardFailed}
                 onRewardStarted={handleRewardStarted}
                 tokenSymbol="USDC"
-                className="reward-button-primary"
                 requireConnection={false}
               >
                 Claim 10 USDC
@@ -94,7 +93,6 @@ function App() {
                 onRewardFailed={handleRewardFailed}
                 onRewardStarted={handleRewardStarted}
                 tokenSymbol="USDT"
-                className="reward-button-secondary"
                 requireConnection={false}
               >
                 Claim 5 USDT

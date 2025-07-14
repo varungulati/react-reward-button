@@ -134,33 +134,91 @@ const RewardButton: React.FC<RewardButtonProps> = ({
   const isButtonLoading = state.isLoading || isTransactionLoading;
   const isButtonDisabled = disabled || isButtonLoading;
 
+  // Default styles with signature shine effect
+  const defaultButtonStyles: React.CSSProperties = {
+    position: 'relative',
+    overflow: 'hidden',
+    border: 'none',
+    padding: '12px 24px',
+    fontSize: '16px',
+    fontWeight: 'bold',
+    borderRadius: '8px',
+    cursor: isButtonDisabled ? 'not-allowed' : 'pointer',
+    background: '#3b82f6',
+    color: 'white',
+    opacity: isButtonDisabled ? 0.6 : 1,
+    transition: 'all 0.2s ease',
+    minWidth: '200px',
+    minHeight: '48px',
+    ...style,
+  };
+
+  // Shine effect styles
+  const shineEffectStyles: React.CSSProperties = {
+    position: 'absolute',
+    top: 0,
+    left: '-100%',
+    width: '100%',
+    height: '100%',
+    background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.4), transparent)',
+    pointerEvents: 'none',
+    animation: isButtonDisabled ? 'none' : 'rewardButtonShine 3s infinite',
+  };
+
   return (
-    <button
-      className={`reward-button ${className}`}
-      style={style}
-      onClick={handleClaimReward}
-      disabled={isButtonDisabled}
-      type="button"
-    >
-      {isButtonLoading ? (
-        <span>{loadingText}</span>
-      ) : (
-        <span>
-          {children}
-          {showRewardAmount && state.tokenInfo && (
-            <span className="reward-amount">
-              {' '}({formatAmount(rewardAmount, state.tokenInfo.decimals)} {state.tokenInfo.symbol})
-            </span>
-          )}
-        </span>
-      )}
-      
-      {state.error && (
-        <div className="reward-button-error" style={{ fontSize: '12px', color: 'red', marginTop: '4px' }}>
-          {state.error}
-        </div>
-      )}
-    </button>
+    <>
+      <style>
+        {`
+          @keyframes rewardButtonShine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+          }
+          .reward-button-shine:hover .reward-button-shine-effect {
+            animation: rewardButtonShine 1.5s infinite !important;
+          }
+        `}
+      </style>
+      <button
+        className={`reward-button reward-button-shine ${className}`}
+        style={defaultButtonStyles}
+        onClick={handleClaimReward}
+        disabled={isButtonDisabled}
+        type="button"
+      >
+        <div
+          style={shineEffectStyles}
+          className="reward-button-shine-effect"
+        />
+        {isButtonLoading ? (
+          <span style={{ position: 'relative', zIndex: 1 }}>{loadingText}</span>
+        ) : (
+          <span style={{ position: 'relative', zIndex: 1 }}>
+            {children}
+            {showRewardAmount && state.tokenInfo && (
+              <span style={{ display: 'block', fontSize: '14px', opacity: 0.9, marginTop: '4px' }}>
+                ({formatAmount(rewardAmount, state.tokenInfo.decimals)} {state.tokenInfo.symbol})
+              </span>
+            )}
+          </span>
+        )}
+        
+        {state.error && (
+          <div style={{ 
+            fontSize: '12px', 
+            color: '#fecaca', 
+            marginTop: '4px',
+            background: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid #ef4444',
+            borderRadius: '4px',
+            padding: '6px 8px',
+            position: 'relative',
+            zIndex: 1
+          }}>
+            {state.error}
+          </div>
+        )}
+      </button>
+    </>
   );
 };
 
