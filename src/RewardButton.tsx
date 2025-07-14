@@ -155,12 +155,12 @@ const RewardButton: React.FC<RewardButtonProps> = ({
   const isButtonLoading = isRewardMode ? (state.isLoading || isTransactionLoading) : false;
   const isButtonDisabled = disabled || isButtonLoading;
 
-  // Enhanced style for reward buttons with shine effect
-  const rewardButtonStyle: React.CSSProperties = {
+  // Only add positioning for shine effect if in reward mode
+  const rewardButtonStyle: React.CSSProperties = isRewardMode ? {
     position: 'relative',
     overflow: 'hidden',
     ...style,
-  };
+  } : style;
 
   // Shine effect styles (only applied in reward mode)
   const shineOverlay = isRewardMode ? (
@@ -190,24 +190,19 @@ const RewardButton: React.FC<RewardButtonProps> = ({
       </style>
       <div style={{ position: 'relative', zIndex: 2 }}>
         {children}
-        {showRewardAmount && state.tokenInfo && (
-          <div style={{ fontSize: '12px', opacity: 0.9, marginTop: '4px' }}>
-            ({formatAmount(rewardAmount || '0', state.tokenInfo.decimals)} {state.tokenInfo.symbol})
-          </div>
-        )}
       </div>
     </>
   ) : children;
 
   // Create safe props object for AwesomeButton
   const safeAwesomeButtonProps = {
-    type: isRewardMode ? 'primary' : (type || 'secondary'),
+    type: type,
     size: size,
     className: `${isRewardMode ? 'reward-button-shine' : ''} ${className}`,
-    style: isRewardMode ? rewardButtonStyle : style,
+    style: rewardButtonStyle,
     onPress: handleButtonPress,
     disabled: isButtonDisabled,
-    ripple: isRewardMode ? true : ripple,
+    ripple: ripple,
     // Only pass safe props
     href: awesomeButtonProps.href,
     target: awesomeButtonProps.target,

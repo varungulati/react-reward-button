@@ -82,9 +82,8 @@ function App() {
               <h2>Regular AwesomeButton Mode</h2>
               <p>When no reward props are provided, it behaves like a regular AwesomeButton</p>
               <RewardButton 
-                type="secondary" 
+                type="primary" 
                 size="medium" 
-                ripple={true}
                 onPress={handleRegularButtonPress}
               >
                 Click Me!
@@ -183,7 +182,7 @@ function App() {
               <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
                 <RewardButton 
                   disabled 
-                  type="secondary" 
+                  type="primary" 
                   onPress={handleRegularButtonPress}
                 >
                   Disabled Regular
@@ -203,7 +202,7 @@ function App() {
 
             <div className="example-section">
               <h2>The Shine Effect</h2>
-              <p>Notice how reward buttons have a signature shine effect that regular buttons don't have</p>
+              <p>Identical buttons - the only difference is the shine effect on reward buttons</p>
               <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
                 <RewardButton 
                   type="primary" 
@@ -211,7 +210,7 @@ function App() {
                   ripple={true}
                   onPress={handleRegularButtonPress}
                 >
-                  No Shine (Regular)
+                  Regular Button
                 </RewardButton>
                 <RewardButton
                   tokenAddress={EXAMPLE_TOKENS.USDC}
@@ -222,7 +221,7 @@ function App() {
                   size="medium"
                   ripple={true}
                 >
-                  Has Shine (Reward)
+                  Reward Button
                 </RewardButton>
               </div>
             </div>
