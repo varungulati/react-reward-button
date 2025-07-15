@@ -9,7 +9,7 @@ console.log('REACT_APP_SENDER_PRIVATE_KEY:', process.env.REACT_APP_SENDER_PRIVAT
 console.log('REACT_APP_TOKEN_CONTRACT_ADDRESS:', process.env.REACT_APP_TOKEN_CONTRACT_ADDRESS);
 console.log('REACT_APP_RPC_URL:', process.env.REACT_APP_RPC_URL);
 console.log('REACT_APP_REOWN_PROJECT_ID:', process.env.REACT_APP_REOWN_PROJECT_ID);
-console.log('REACT_APP_REOWN_NETWORK:', process.env.REACT_APP_NETWORK);
+console.log('REACT_APP_NETWORK:', process.env.REACT_APP_NETWORK);
 
 // Helper function to get required env var
 const getRequiredEnvVar = (name: string): string => {
@@ -41,8 +41,30 @@ export const rewardConfig = {
 // Create a .env file in the examples directory with:
 // REACT_APP_SENDER_ADDRESS=0x...
 // REACT_APP_SENDER_PRIVATE_KEY=0x...
-// REACT_APP_NETWORK=mainnet
-// REACT_APP_RPC_URL=https://mainnet.infura.io/v3/your-key
+// REACT_APP_TOKEN_CONTRACT_ADDRESS=0x... (token address for your chosen network)
+// REACT_APP_NETWORK=mainnet (options: mainnet, sepolia, testnet, polygon, mumbai, polygon-testnet)
+// REACT_APP_RPC_URL=https://mainnet.infura.io/v3/your-key (RPC URL for your chosen network)
 // REACT_APP_REOWN_PROJECT_ID=your-project-id
+//
+// Network Examples:
+// For Ethereum Mainnet:
+//   REACT_APP_NETWORK=mainnet
+//   REACT_APP_RPC_URL=https://mainnet.infura.io/v3/your-key
+//   REACT_APP_TOKEN_CONTRACT_ADDRESS=0xA0b86a33E6441E95b4df2E8FAb4B6CbF6F77eB4D (example)
+//
+// For Ethereum Sepolia Testnet:
+//   REACT_APP_NETWORK=sepolia
+//   REACT_APP_RPC_URL=https://sepolia.infura.io/v3/your-key
+//   REACT_APP_TOKEN_CONTRACT_ADDRESS=0x... (testnet token address)
+//
+// For Polygon Mainnet:
+//   REACT_APP_NETWORK=polygon
+//   REACT_APP_RPC_URL=https://polygon-rpc.com
+//   REACT_APP_TOKEN_CONTRACT_ADDRESS=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174 (USDC on Polygon)
+//
+// For Polygon Mumbai Testnet:
+//   REACT_APP_NETWORK=mumbai
+//   REACT_APP_RPC_URL=https://rpc-mumbai.maticvigil.com
+//   REACT_APP_TOKEN_CONTRACT_ADDRESS=0x... (Mumbai testnet token address)
 
 export default rewardConfig; 

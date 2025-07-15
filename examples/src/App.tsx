@@ -1,5 +1,5 @@
 import { WagmiProvider } from 'wagmi';
-import { mainnet } from 'wagmi/chains';
+import { mainnet, polygon, sepolia, polygonMumbai } from 'wagmi/chains';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createAppKit } from '@reown/appkit/react';
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
@@ -16,16 +16,45 @@ const queryClient = new QueryClient();
 // For demo purposes, we'll use a placeholder that won't make API calls
 const projectId = rewardConfig.reownProjectId;
 
+// ✅ Network selection based on REACT_APP_NETWORK environment variable
+const getNetworkFromEnv = () => {
+  const networkName = rewardConfig.network.toLowerCase();
+  
+  switch (networkName) {
+    case 'mainnet':
+      return mainnet;
+    case 'sepolia':
+    case 'testnet':
+      return sepolia;
+    case 'polygon':
+      return polygon;
+    case 'mumbai':
+    case 'polygon-testnet':
+      return polygonMumbai;
+    default:
+      console.warn(`Unknown network: ${networkName}, defaulting to mainnet`);
+      return mainnet;
+  }
+};
+
+const selectedNetwork = getNetworkFromEnv();
+
+console.log('🌐 Network Configuration:');
+console.log('  REACT_APP_NETWORK:', rewardConfig.network);
+console.log('  Selected Network:', selectedNetwork.name);
+console.log('  Chain ID:', selectedNetwork.id);
+console.log('  RPC URL:', rewardConfig.rpcUrl);
+
 // Set up the Wagmi adapter
 const wagmiAdapter = new WagmiAdapter({
   projectId,
-  networks: [mainnet],
+  networks: [selectedNetwork],
 });
 
 // Create the AppKit with wallet selection modal
 createAppKit({
   adapters: [wagmiAdapter],
-  networks: [mainnet],
+  networks: [selectedNetwork],
   projectId,
   metadata: {
     name: 'React Reward Button',
