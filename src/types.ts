@@ -1,13 +1,4 @@
-// Window interface extension for ethereum property
-declare global {
-  interface Window {
-    ethereum?: {
-      request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
-      on: (event: string, handler: (...args: unknown[]) => void) => void;
-      removeListener: (event: string, handler: (...args: unknown[]) => void) => void;
-    };
-  }
-}
+// Types are provided by web3modal and wagmi dependencies
 
 // Types for AwesomeButton compatibility
 export interface AwesomeButtonProps {
@@ -55,6 +46,8 @@ export interface RewardButtonProps extends AwesomeButtonProps {
   requireConnection?: boolean;
   /** Custom loading text for reward operations */
   loadingText?: string;
+  /** Whether to use Web3Modal for wallet connection instead of the default wagmi connect */
+  useWeb3Modal?: boolean;
 }
 
 export interface RewardButtonState {

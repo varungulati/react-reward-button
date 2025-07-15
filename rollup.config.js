@@ -17,12 +17,14 @@ export default [
         format: 'cjs',
         sourcemap: true,
         exports: 'named',
+        inlineDynamicImports: true,
       },
       {
         file: packageJson.module,
         format: 'esm',
         sourcemap: true,
         exports: 'named',
+        inlineDynamicImports: true,
       },
     ],
     plugins: [
@@ -44,7 +46,16 @@ export default [
         rootDir: 'src',
       }),
     ],
-    external: ['react', 'react-dom', 'ethers', 'wagmi', '@rainbow-me/rainbowkit'],
+    external: [
+      'react',
+      'react-dom',
+      'wagmi',
+      '@tanstack/react-query',
+      'ethers',
+      '@reown/appkit',
+      '@reown/appkit/react',
+      '@reown/appkit-adapter-wagmi'
+    ],
   },
   {
     input: 'dist/types/index.d.ts',

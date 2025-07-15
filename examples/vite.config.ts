@@ -6,31 +6,38 @@ import path from 'path'
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 3004,
+    port: 3005,
     open: true
   },
   define: {
     global: 'globalThis',
+    'process.env': {},
   },
   resolve: {
     alias: {
       buffer: 'buffer',
       process: 'process/browser',
-      stream: 'stream-browserify',
-      util: 'util',
-      '@safe-global/safe-apps-provider': path.resolve(__dirname, 'node_modules/@safe-global/safe-apps-provider')
+      util: 'util'
     },
   },
   optimizeDeps: {
-    include: ['buffer', 'process'],
-    exclude: ['@safe-global/safe-apps-provider'],
+    include: ['buffer', 'process', 'util'],
+    exclude: ['stream']
   },
   build: {
     rollupOptions: {
-      external: ['@safe-global/safe-apps-provider'],
+      external: [
+        '@safe-globalThis/safe-apps-sdk',
+        '@safe-global/safe-apps-sdk',
+        '@safe-globalThis/safe-apps-provider',
+        '@safe-global/safe-apps-provider',
+        /^@safe-global\/.*/,
+        /^@safe-globalThis\/.*/
+      ],
       output: {
-        globals: {
-          '@safe-global/safe-apps-provider': 'SafeAppsProvider'
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          wagmi: ['wagmi', '@tanstack/react-query']
         }
       }
     }

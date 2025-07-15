@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AwesomeButton } from 'react-awesome-button';
-import { useAccount, useConnect, usePrepareContractWrite, useContractWrite } from 'wagmi';
+import { useAccount, useConnect, useWriteContract } from 'wagmi';
+import { useAppKit } from '@reown/appkit/react';
 import { ethers } from 'ethers';
 import { RewardButtonProps, RewardButtonState, TokenInfo } from './types';
 import { ERC20_ABI } from './constants';
@@ -21,6 +22,7 @@ const RewardButton: React.FC<RewardButtonProps> = ({
   showRewardAmount = true,
   tokenSymbol = 'TOKEN',
   requireConnection = true,
+  useWeb3Modal = false, // Deprecated but kept for backwards compatibility
   type = 'primary',
   size = 'medium',
   ripple = false,
@@ -39,28 +41,26 @@ const RewardButton: React.FC<RewardButtonProps> = ({
   const { address, isConnected } = useAccount();
   const { connect, connectors } = useConnect();
 
+  // Reown AppKit for wallet selection modal
+  const { open: openAppKit } = useAppKit();
+
+  // Check if connected
+  const isWalletConnected = isConnected;
+
   // Determine the target address for the reward (only relevant in reward mode)
   const targetAddress = isRewardMode ? (recipientAddress || address || '0x742d35Cc6634C0532925a3b8D25c8c5c8A2B9E6D') : undefined;
 
-  // Prepare the contract write for token transfer (only if in reward mode)
-  const { config: contractWriteConfig } = usePrepareContractWrite({
-    address: tokenAddress as `0x${string}`,
-    abi: ERC20_ABI,
-    functionName: 'transfer',
-    args: [targetAddress as `0x${string}`, BigInt(rewardAmount || '0')],
-    enabled: Boolean(isRewardMode && targetAddress && rewardAmount && tokenAddress && isConnected),
-  });
-
   // Contract write hook for executing the transaction (only if in reward mode)
-  const { write: executeTransfer, isLoading: isTransactionLoading } = useContractWrite({
-    ...contractWriteConfig,
-    onSuccess: (data) => {
-      setState(prev => ({ ...prev, isLoading: false, error: null }));
-      onRewardClaimed?.(data.hash, rewardAmount || '0');
-    },
-    onError: (error) => {
-      setState(prev => ({ ...prev, isLoading: false, error: error.message }));
-      onRewardFailed?.(error);
+  const { writeContract: executeTransfer, isPending: isTransactionLoading } = useWriteContract({
+    mutation: {
+      onSuccess: (data: any) => {
+        setState(prev => ({ ...prev, isLoading: false, error: null }));
+        onRewardClaimed?.(data, rewardAmount || '0');
+      },
+      onError: (error: any) => {
+        setState(prev => ({ ...prev, isLoading: false, error: error.message }));
+        onRewardFailed?.(error);
+      },
     },
   });
 
@@ -100,21 +100,23 @@ const RewardButton: React.FC<RewardButtonProps> = ({
 
   const handleClaimReward = async () => {
     try {
-      if (requireConnection && !isConnected) {
-        // Connect wallet first
-        const connector = connectors[0];
-        if (connector) {
-          connect({ connector });
-        }
+      if (requireConnection && !isWalletConnected) {
+        // Open Reown AppKit wallet selection modal
+        openAppKit();
         return;
       }
 
       setState(prev => ({ ...prev, isLoading: true, error: null }));
       onRewardStarted?.();
 
-      // For demo purposes, if no executeTransfer function is available, simulate the transaction
-      if (executeTransfer) {
-        executeTransfer();
+      // Handle token transfer using wagmi
+      if (executeTransfer && targetAddress && tokenAddress && rewardAmount) {
+        executeTransfer({
+          address: tokenAddress as `0x${string}`,
+          abi: ERC20_ABI,
+          functionName: 'transfer',
+          args: [targetAddress as `0x${string}`, BigInt(rewardAmount)],
+        });
       } else {
         // Simulate a transaction for demo purposes
         setTimeout(() => {
@@ -155,12 +157,38 @@ const RewardButton: React.FC<RewardButtonProps> = ({
   const isButtonLoading = isRewardMode ? (state.isLoading || isTransactionLoading) : false;
   const isButtonDisabled = disabled || isButtonLoading;
 
-  // Only add positioning for shine effect if in reward mode
+  // Only add minimal positioning for shine effect if in reward mode
   const rewardButtonStyle: React.CSSProperties = isRewardMode ? {
     position: 'relative',
     overflow: 'hidden',
+    // Text visibility and sizing improvements
+    minWidth: 'fit-content',
+    width: 'auto',
+    height: 'auto',
+    minHeight: 'fit-content',
+    padding: '8px 16px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis',
+    lineHeight: '1.2',
     ...style,
-  } : style;
+  } : {
+    // Regular button mode - still ensure text visibility
+    minWidth: 'fit-content',
+    width: 'auto',
+    height: 'auto',
+    minHeight: 'fit-content',
+    padding: '8px 16px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis',
+    lineHeight: '1.2',
+    ...style,
+  };
 
   // Shine effect styles (only applied in reward mode)
   const shineOverlay = isRewardMode ? (
@@ -186,13 +214,65 @@ const RewardButton: React.FC<RewardButtonProps> = ({
           .reward-button-shine:hover::before {
             animation: ${isButtonDisabled ? 'none' : 'rewardButtonShine 1.5s infinite'};
           }
+          /* Ensure AwesomeButton respects text sizing */
+          .reward-button-shine,
+          .reward-button-shine > *,
+          .reward-button-shine button {
+            min-width: fit-content !important;
+            width: auto !important;
+            height: auto !important;
+            min-height: fit-content !important;
+            max-width: none !important;
+            overflow: visible !important;
+          }
+          .reward-button-shine .aws-btn,
+          .reward-button-shine .aws-btn > *,
+          .reward-button-shine .aws-btn button {
+            min-width: fit-content !important;
+            width: auto !important;
+            height: auto !important;
+            min-height: fit-content !important;
+            max-width: none !important;
+            overflow: visible !important;
+            white-space: nowrap !important;
+            text-overflow: ellipsis !important;
+            padding: 8px 16px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+          }
         `}
       </style>
-      <div style={{ position: 'relative', zIndex: 2 }}>
+      <span style={{ position: 'relative', zIndex: 2 }}>
         {children}
-      </div>
+      </span>
     </>
-  ) : children;
+  ) : (
+    <>
+      <style>
+        {`
+          /* Ensure AwesomeButton respects text sizing for regular buttons */
+          .aws-btn,
+          .aws-btn > *,
+          .aws-btn button {
+            min-width: fit-content !important;
+            width: auto !important;
+            height: auto !important;
+            min-height: fit-content !important;
+            max-width: none !important;
+            overflow: visible !important;
+            white-space: nowrap !important;
+            text-overflow: ellipsis !important;
+            padding: 8px 16px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+          }
+        `}
+      </style>
+      {children}
+    </>
+  );
 
   // Create safe props object for AwesomeButton
   const safeAwesomeButtonProps = {
@@ -203,7 +283,7 @@ const RewardButton: React.FC<RewardButtonProps> = ({
     onPress: handleButtonPress,
     disabled: isButtonDisabled,
     ripple: ripple,
-    // Only pass safe props
+    // Pass through all safe AwesomeButton props
     href: awesomeButtonProps.href,
     target: awesomeButtonProps.target,
     visible: awesomeButtonProps.visible,
@@ -211,6 +291,9 @@ const RewardButton: React.FC<RewardButtonProps> = ({
     before: awesomeButtonProps.before,
     after: awesomeButtonProps.after,
     active: awesomeButtonProps.active,
+    // Additional AwesomeButton properties (type-safe)
+    containerProps: awesomeButtonProps.containerProps,
+    cssModule: awesomeButtonProps.cssModule,
   };
 
   return (
@@ -232,6 +315,7 @@ const RewardButton: React.FC<RewardButtonProps> = ({
           {state.error}
         </div>
       )}
+
     </>
   );
 };
