@@ -30,8 +30,19 @@ export interface RewardButtonProps extends AwesomeButtonProps {
   tokenAddress?: string;
   /** The amount of tokens to reward (in wei or token units) (optional - if not provided, behaves as regular button) */
   rewardAmount?: string;
-  /** The recipient address for the reward (if not provided, uses connected wallet) */
+  /** 
+   * The recipient address for the reward (optional)
+   * Priority: 1. Connected wallet address, 2. This recipientAddress prop
+   * If neither is provided, the reward claim will fail with an error
+   * No fallback address is used for security reasons
+   */
   recipientAddress?: string;
+  /** The sender wallet address that holds the reward tokens */
+  senderAddress?: string;
+  /** The private key of the sender wallet (for signing transactions) */
+  senderPrivateKey?: string;
+  /** RPC URL for the network (optional - uses default if not provided) */
+  rpcUrl?: string;
   /** Callback function called when reward is successfully claimed */
   onRewardClaimed?: (txHash: string, amount: string) => void;
   /** Callback function called when reward claim fails */

@@ -5,6 +5,7 @@ import { createAppKit } from '@reown/appkit/react';
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
 import { RewardButton } from 'react-reward-button';
 import { ethers } from 'ethers';
+import rewardConfig from './config';
 import 'react-awesome-button/dist/styles.css';
 import './App.css';
 
@@ -13,7 +14,7 @@ const queryClient = new QueryClient();
 
 // Configure project ID - you can get this from https://cloud.reown.com/
 // For demo purposes, we'll use a placeholder that won't make API calls
-const projectId = process.env.REACT_APP_REOWN_PROJECT_ID || 'your-project-id-here';
+const projectId = rewardConfig.reownProjectId;
 
 // Set up the Wagmi adapter
 const wagmiAdapter = new WagmiAdapter({
@@ -43,12 +44,8 @@ createAppKit({
 // Get the wagmi config
 const wagmiConfig = wagmiAdapter.wagmiConfig;
 
-// Example token addresses
-const EXAMPLE_TOKENS = {
-  USDC: '0xA0b86a33E6441b6b07c2fE4c2b4B8B1d8B7a0F4c',
-  USDT: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
-  DAI: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
-};
+// Token address from environment variable
+const TOKEN_ADDRESS = rewardConfig.tokenAddress;
 
 function App() {
   const handleRewardClaimed = (txHash: string, amount: string) => {
@@ -83,6 +80,30 @@ function App() {
           </header>
 
             <main className="App-main">
+              <div className="example-section">
+                <h2>Environment Configuration</h2>
+                <p>
+                  <strong>Sender Wallet Setup:</strong> The reward system uses a sender wallet to distribute tokens. 
+                  Create a <code>.env</code> file in the examples directory with the following variables:
+                </p>
+                <div style={{ 
+                  background: '#f5f5f5', 
+                  padding: '16px', 
+                  borderRadius: '8px', 
+                  fontFamily: 'monospace',
+                  fontSize: '14px',
+                  marginBottom: '16px'
+                }}>
+                  <div>REACT_APP_SENDER_ADDRESS=0x742d35Cc6634C0532925a3b8D25c8c5c8A2B9E6D</div>
+                  <div>REACT_APP_SENDER_PRIVATE_KEY=0x0123456789abcdef...</div>
+                  <div>REACT_APP_RPC_URL=https://mainnet.infura.io/v3/your-key</div>
+                  <div>REACT_APP_REOWN_PROJECT_ID=your-project-id</div>
+                </div>
+                <p style={{ fontSize: '14px', color: '#666' }}>
+                  <strong>⚠️ Security Note:</strong> Never commit private keys to version control. Use secure environment management in production.
+                </p>
+              </div>
+
               <div className="example-section">
                 <h2>Regular AwesomeButton Mode</h2>
                 <p>When no reward props are provided, it behaves like a regular AwesomeButton</p>
@@ -190,17 +211,19 @@ function App() {
 
               <div className="example-section">
                 <h2>Enhanced Reward Button Mode</h2>
-                <p>Reward buttons with enhanced visual appeal and icons</p>
+                <p>Reward buttons with enhanced visual appeal and icons. Uses connected wallet address as recipient.</p>
                 <div className="single-button">
                   <RewardButton
-                    tokenAddress={EXAMPLE_TOKENS.USDC}
+                    tokenAddress={TOKEN_ADDRESS}
                     rewardAmount={ethers.parseUnits('10', 6).toString()}
-                    recipientAddress="0x742d35Cc6634C0532925a3b8D25c8c5c8A2B9E6D"
+                    senderAddress={rewardConfig.senderAddress}
+                    senderPrivateKey={rewardConfig.senderPrivateKey}
+                    rpcUrl={rewardConfig.rpcUrl}
                     onRewardClaimed={handleRewardClaimed}
                     onRewardFailed={handleRewardFailed}
                     onRewardStarted={handleRewardStarted}
-                    tokenSymbol="USDC"
-                    requireConnection={false}
+                    tokenSymbol="TOKEN"
+                    requireConnection={true}
                     type="primary"
                     size="large"
                     ripple={true}
@@ -213,17 +236,19 @@ function App() {
               </div>
 
               <div className="example-section">
-                <h2>Wallet Connection with Style</h2>
-                <p>Reward button with enhanced wallet connection styling</p>
+                <h2>Dynamic Wallet Connection</h2>
+                <p>Reward button that requires wallet connection - recipient address is automatically set to connected wallet</p>
                 <div className="single-button">
                   <RewardButton
-                    tokenAddress={EXAMPLE_TOKENS.USDC}
+                    tokenAddress={TOKEN_ADDRESS}
                     rewardAmount={ethers.parseUnits('5', 6).toString()}
-                    recipientAddress="0x742d35Cc6634C0532925a3b8D25c8c5c8A2B9E6D"
+                    senderAddress={rewardConfig.senderAddress}
+                    senderPrivateKey={rewardConfig.senderPrivateKey}
+                    rpcUrl={rewardConfig.rpcUrl}
                     onRewardClaimed={handleRewardClaimed}
                     onRewardFailed={handleRewardFailed}
                     onRewardStarted={handleRewardStarted}
-                    tokenSymbol="USDC"
+                    tokenSymbol="TOKEN"
                     requireConnection={true}
                     type="primary"
                     size="large"
@@ -238,18 +263,20 @@ function App() {
 
               <div className="example-section">
                 <h2>Styled Multi-Token Rewards</h2>
-                <p>Different reward buttons with enhanced styling and token-specific icons</p>
+                <p>Different reward buttons with enhanced styling and token-specific icons. All use connected wallet as recipient.</p>
                 <div className="button-row">
                   <div className="button-container">
                     <RewardButton
-                      tokenAddress={EXAMPLE_TOKENS.USDT}
+                      tokenAddress={TOKEN_ADDRESS}
                       rewardAmount={ethers.parseUnits('5', 6).toString()}
-                      recipientAddress="0x742d35Cc6634C0532925a3b8D25c8c5c8A2B9E6D"
+                      senderAddress={rewardConfig.senderAddress}
+                      senderPrivateKey={rewardConfig.senderPrivateKey}
+                      rpcUrl={rewardConfig.rpcUrl}
                       onRewardClaimed={handleRewardClaimed}
                       onRewardFailed={handleRewardFailed}
                       onRewardStarted={handleRewardStarted}
                       tokenSymbol="USDT"
-                      requireConnection={false}
+                      requireConnection={true}
                       type="secondary"
                       size="medium"
                       ripple={true}
@@ -262,14 +289,16 @@ function App() {
                   </div>
                   <div className="button-container">
                     <RewardButton
-                      tokenAddress={EXAMPLE_TOKENS.DAI}
+                      tokenAddress={TOKEN_ADDRESS}
                       rewardAmount={ethers.parseUnits('20', 18).toString()}
-                      recipientAddress="0x742d35Cc6634C0532925a3b8D25c8c5c8A2B9E6D"
+                      senderAddress={rewardConfig.senderAddress}
+                      senderPrivateKey={rewardConfig.senderPrivateKey}
+                      rpcUrl={rewardConfig.rpcUrl}
                       onRewardClaimed={handleRewardClaimed}
                       onRewardFailed={handleRewardFailed}
                       onRewardStarted={handleRewardStarted}
                       tokenSymbol="DAI"
-                      requireConnection={false}
+                      requireConnection={true}
                       type="primary"
                       size="medium"
                       ripple={true}
@@ -335,9 +364,9 @@ function App() {
                   <div className="button-container">
                     <RewardButton 
                       disabled
-                      tokenAddress={EXAMPLE_TOKENS.USDC}
+                      tokenAddress={TOKEN_ADDRESS}
                       rewardAmount={ethers.parseUnits('10', 6).toString()}
-                      tokenSymbol="USDC"
+                      tokenSymbol="TOKEN"
                       requireConnection={false}
                       type="primary"
                       size="medium"
@@ -370,9 +399,9 @@ function App() {
                   </div>
                   <div className="button-container">
                     <RewardButton
-                      tokenAddress={EXAMPLE_TOKENS.USDC}
+                      tokenAddress={TOKEN_ADDRESS}
                       rewardAmount={ethers.parseUnits('1', 6).toString()}
-                      tokenSymbol="USDC"
+                      tokenSymbol="TOKEN"
                       requireConnection={false}
                       type="primary"
                       size="large"
@@ -383,6 +412,102 @@ function App() {
                       Reward Button
                     </RewardButton>
                     <span className="button-label">With Shine Effect</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="example-section">
+                <h2>Connected Wallet Rewards</h2>
+                <p>Examples showing rewards sent to connected wallet addresses</p>
+                <div className="button-row">
+                  <div className="button-container">
+                    <RewardButton
+                      tokenAddress={TOKEN_ADDRESS}
+                      rewardAmount={ethers.parseUnits('3', 6).toString()}
+                      senderAddress={rewardConfig.senderAddress}
+                      senderPrivateKey={rewardConfig.senderPrivateKey}
+                      rpcUrl={rewardConfig.rpcUrl}
+                      onRewardClaimed={handleRewardClaimed}
+                      onRewardFailed={handleRewardFailed}
+                      onRewardStarted={handleRewardStarted}
+                      tokenSymbol="TOKEN"
+                      requireConnection={true}
+                      type="secondary"
+                      size="medium"
+                      ripple={true}
+                      before={<span>🎯</span>}
+                      after={<span>📍</span>}
+                    >
+                      Connect & Claim 3 USDC
+                    </RewardButton>
+                    <span className="button-label">Uses Connected Wallet</span>
+                  </div>
+                  <div className="button-container">
+                    <RewardButton
+                      tokenAddress={TOKEN_ADDRESS}
+                      rewardAmount={ethers.parseUnits('3', 6).toString()}
+                      senderAddress={rewardConfig.senderAddress}
+                      senderPrivateKey={rewardConfig.senderPrivateKey}
+                      rpcUrl={rewardConfig.rpcUrl}
+                      onRewardClaimed={handleRewardClaimed}
+                      onRewardFailed={handleRewardFailed}
+                      onRewardStarted={handleRewardStarted}
+                      tokenSymbol="TOKEN"
+                      requireConnection={true}
+                      type="primary"
+                      size="medium"
+                      ripple={true}
+                      before={<span>🔄</span>}
+                      after={<span>🏠</span>}
+                    >
+                      Send to My Wallet
+                    </RewardButton>
+                    <span className="button-label">Uses Connected Wallet</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="example-section">
+                <h2>Error Handling</h2>
+                <p>Examples showing error handling when no recipient address is available</p>
+                <div className="button-row">
+                  <div className="button-container">
+                    <RewardButton
+                      tokenAddress={TOKEN_ADDRESS}
+                      rewardAmount={ethers.parseUnits('1', 6).toString()}
+                      onRewardClaimed={handleRewardClaimed}
+                      onRewardFailed={handleRewardFailed}
+                      onRewardStarted={handleRewardStarted}
+                      tokenSymbol="TOKEN"
+                      requireConnection={true}
+                      type="primary"
+                      size="medium"
+                      ripple={true}
+                      before={<span>⚠️</span>}
+                      after={<span>🔐</span>}
+                    >
+                      Requires Connection
+                    </RewardButton>
+                    <span className="button-label">Must Connect Wallet</span>
+                  </div>
+                  <div className="button-container">
+                    <RewardButton
+                      tokenAddress={TOKEN_ADDRESS}
+                      rewardAmount={ethers.parseUnits('1', 6).toString()}
+                      onRewardClaimed={handleRewardClaimed}
+                      onRewardFailed={handleRewardFailed}
+                      onRewardStarted={handleRewardStarted}
+                      tokenSymbol="TOKEN"
+                      requireConnection={false}
+                      type="secondary"
+                      size="medium"
+                      ripple={true}
+                      before={<span>❌</span>}
+                      after={<span>🚫</span>}
+                    >
+                      No Recipient Error
+                    </RewardButton>
+                    <span className="button-label">Will Show Error</span>
                   </div>
                 </div>
               </div>
