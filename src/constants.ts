@@ -49,6 +49,17 @@ export const ERC20_ABI = [
     "type": "function"
   },
   {
+    "constant": false,
+    "inputs": [
+      {"name": "_from", "type": "address"},
+      {"name": "_to", "type": "address"},
+      {"name": "_value", "type": "uint256"}
+    ],
+    "name": "transferFrom",
+    "outputs": [{"name": "", "type": "bool"}],
+    "type": "function"
+  },
+  {
     "constant": true,
     "inputs": [
       {"name": "_owner", "type": "address"},

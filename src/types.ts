@@ -59,6 +59,12 @@ export interface RewardButtonProps extends AwesomeButtonProps {
   loadingText?: string;
   /** Whether to use Web3Modal for wallet connection instead of the default wagmi connect */
   useWeb3Modal?: boolean;
+  /** 
+   * Whether the user (receiver) pays gas fees instead of sender
+   * - true: Connected wallet pays gas fees (transferFrom pattern)
+   * - false: Sender wallet pays gas fees (transfer pattern - default)
+   */
+  userPaysGas?: boolean;
 }
 
 export interface RewardButtonState {

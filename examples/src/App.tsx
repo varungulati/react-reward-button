@@ -339,6 +339,153 @@ function App() {
             </div>
 
             <div className="example-section">
+              <h2>Gas Payment Comparison</h2>
+              <p>Compare sender-pays-gas vs receiver-pays-gas approaches</p>
+              <div className="button-grid">
+                <div className="button-container">
+                  <RewardButton
+                    tokenAddress={TOKEN_ADDRESS}
+                    rewardAmount={ethers.parseUnits('5', 6).toString()}
+                    senderAddress={rewardConfig.senderAddress}
+                    senderPrivateKey={rewardConfig.senderPrivateKey}
+                    rpcUrl={rewardConfig.rpcUrl}
+                    onRewardClaimed={handleRewardClaimed}
+                    onRewardFailed={handleRewardFailed}
+                    onRewardStarted={handleRewardStarted}
+                    tokenSymbol="USDC"
+                    requireConnection={true}
+                    userPaysGas={false}
+                    type="primary"
+                    size="medium"
+                    before={<span>🏢</span>}
+                    after={<span>💰</span>}
+                  >
+                    Sender Pays Gas
+                  </RewardButton>
+                  <span className="button-label">Sender pays ~$0.18 gas</span>
+                </div>
+                <div className="button-container">
+                  <RewardButton
+                    tokenAddress={TOKEN_ADDRESS}
+                    rewardAmount={ethers.parseUnits('5', 6).toString()}
+                    senderAddress={rewardConfig.senderAddress}
+                    senderPrivateKey={rewardConfig.senderPrivateKey}
+                    rpcUrl={rewardConfig.rpcUrl}
+                    onRewardClaimed={handleRewardClaimed}
+                    onRewardFailed={handleRewardFailed}
+                    onRewardStarted={handleRewardStarted}
+                    tokenSymbol="USDC"
+                    requireConnection={true}
+                    userPaysGas={true}
+                    type="secondary"
+                    size="medium"
+                    before={<span>👤</span>}
+                    after={<span>⛽</span>}
+                  >
+                    Receiver Pays Gas
+                  </RewardButton>
+                  <span className="button-label">You pay ~$0.18 gas</span>
+                </div>
+              </div>
+              <div style={{ 
+                background: '#f8f9fa', 
+                padding: '16px', 
+                borderRadius: '8px', 
+                marginTop: '16px',
+                fontSize: '14px',
+                color: '#666'
+              }}>
+                <strong>Key Differences:</strong>
+                <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
+                  <li><strong>Sender Pays Gas:</strong> Uses <code>transfer()</code> function, sender wallet pays gas fees</li>
+                  <li><strong>Receiver Pays Gas:</strong> Uses <code>transferFrom()</code> function, connected wallet pays gas fees</li>
+                  <li><strong>⚠️ Important:</strong> For receiver-pays-gas, sender must first call <code>approve(receiverAddress, amount)</code></li>
+                </ul>
+                <div style={{ 
+                  background: '#fff3cd', 
+                  border: '1px solid #ffd60a', 
+                  borderRadius: '4px',
+                  padding: '8px',
+                  marginTop: '8px',
+                  fontSize: '12px'
+                }}>
+                  <strong>Testing Note:</strong> The receiver-pays-gas buttons will fail unless the sender has pre-approved your connected wallet address. In production, you would implement an approval mechanism.
+                </div>
+              </div>
+            </div>
+
+            <div className="example-section">
+              <h2>Advanced Gas Payment Examples</h2>
+              <p>Different scenarios for gas payment handling</p>
+              <div className="button-grid">
+                <div className="button-container">
+                  <RewardButton
+                    tokenAddress={TOKEN_ADDRESS}
+                    rewardAmount={ethers.parseUnits('1', 6).toString()}
+                    senderAddress={rewardConfig.senderAddress}
+                    senderPrivateKey={rewardConfig.senderPrivateKey}
+                    rpcUrl={rewardConfig.rpcUrl}
+                    onRewardClaimed={handleRewardClaimed}
+                    onRewardFailed={handleRewardFailed}
+                    onRewardStarted={handleRewardStarted}
+                    tokenSymbol="USDC"
+                    requireConnection={true}
+                    userPaysGas={false}
+                    type="primary"
+                    size="small"
+                    before={<span>🎁</span>}
+                  >
+                    Small Reward (Sender Pays)
+                  </RewardButton>
+                  <span className="button-label">Good for small amounts</span>
+                </div>
+                <div className="button-container">
+                  <RewardButton
+                    tokenAddress={TOKEN_ADDRESS}
+                    rewardAmount={ethers.parseUnits('100', 6).toString()}
+                    senderAddress={rewardConfig.senderAddress}
+                    senderPrivateKey={rewardConfig.senderPrivateKey}
+                    rpcUrl={rewardConfig.rpcUrl}
+                    onRewardClaimed={handleRewardClaimed}
+                    onRewardFailed={handleRewardFailed}
+                    onRewardStarted={handleRewardStarted}
+                    tokenSymbol="USDC"
+                    requireConnection={true}
+                    userPaysGas={true}
+                    type="primary"
+                    size="medium"
+                    before={<span>💎</span>}
+                  >
+                    Large Reward (User Pays)
+                  </RewardButton>
+                  <span className="button-label">Good for large amounts</span>
+                </div>
+                <div className="button-container">
+                  <RewardButton
+                    tokenAddress={TOKEN_ADDRESS}
+                    rewardAmount={ethers.parseUnits('10', 6).toString()}
+                    senderAddress={rewardConfig.senderAddress}
+                    senderPrivateKey={rewardConfig.senderPrivateKey}
+                    rpcUrl={rewardConfig.rpcUrl}
+                    onRewardClaimed={handleRewardClaimed}
+                    onRewardFailed={handleRewardFailed}
+                    onRewardStarted={handleRewardStarted}
+                    tokenSymbol="USDC"
+                    requireConnection={true}
+                    userPaysGas={true}
+                    type="secondary"
+                    size="medium"
+                    before={<span>🌟</span>}
+                    active={true}
+                  >
+                    Premium Claim
+                  </RewardButton>
+                  <span className="button-label">Self-service claim</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="example-section">
               <h2>Customizable Styling</h2>
               <p>Override default styling with custom CSS properties and themes</p>
               <div className="button-grid">

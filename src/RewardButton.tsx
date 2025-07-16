@@ -26,6 +26,7 @@ const RewardButton: React.FC<RewardButtonProps> = ({
   tokenSymbol = 'TOKEN',
   requireConnection = true,
   useWeb3Modal = false, // Deprecated but kept for backwards compatibility
+  userPaysGas = false, // New prop - false means sender pays gas (default)
   // Default awesome-button styling that matches the awesome-buttons page
   type = 'primary',
   size = 'medium',
@@ -53,6 +54,9 @@ const RewardButton: React.FC<RewardButtonProps> = ({
   // Check if connected - more robust validation
   const isWalletConnected = isConnected && address;
 
+  // For userPaysGas mode, always require wallet connection
+  const effectiveRequireConnection = userPaysGas ? true : requireConnection;
+
   // Determine the target address for the reward (only relevant in reward mode)
   // Priority: 1. Connected wallet address (if truly connected), 2. Provided recipientAddress
   // No fallback address - will throw error if neither is available
@@ -65,17 +69,19 @@ const RewardButton: React.FC<RewardButtonProps> = ({
   useEffect(() => {
     if (isRewardMode) {
       console.log('🎯 Recipient Address Selection:');
+      console.log('  userPaysGas:', userPaysGas);
       console.log('  isConnected:', isConnected);
       console.log('  Connected wallet address:', address);
       console.log('  Wallet truly connected:', isWalletConnected);
       console.log('  Provided recipientAddress prop:', recipientAddress);
       console.log('  Final target address:', targetAddress);
       console.log('  Using connected wallet:', isWalletConnected ? '✅ YES' : '❌ NO');
+      console.log('  Effective require connection:', effectiveRequireConnection);
     }
-  }, [isConnected, address, recipientAddress, targetAddress, isRewardMode, isWalletConnected]);
+  }, [isConnected, address, recipientAddress, targetAddress, isRewardMode, isWalletConnected, userPaysGas, effectiveRequireConnection]);
 
   // Show warning if no wallet connected and no recipient address provided
-  const needsWalletConnection = isRewardMode && !isWalletConnected && !recipientAddress && requireConnection;
+  const needsWalletConnection = isRewardMode && !isWalletConnected && !recipientAddress && effectiveRequireConnection;
 
   // Effect to handle wallet connection and auto-proceed with reward claim
   useEffect(() => {
@@ -112,7 +118,19 @@ const RewardButton: React.FC<RewardButtonProps> = ({
       },
       onError: (error: any) => {
         console.error('Transaction failed:', error);
-        setState(prev => ({ ...prev, isLoading: false, error: error.message }));
+        
+        // Enhanced error handling for transferFrom failures
+        let errorMessage = error.message || 'Transaction failed';
+        
+        if (userPaysGas && errorMessage.includes('insufficient allowance')) {
+          errorMessage = 'Insufficient allowance: Sender must approve your wallet address to spend tokens. Ask the sender to call approve() first.';
+        } else if (userPaysGas && errorMessage.includes('transfer amount exceeds allowance')) {
+          errorMessage = 'Transfer amount exceeds allowance: The approved amount is less than the reward amount.';
+        } else if (userPaysGas && (errorMessage.includes('ERC20:') || errorMessage.includes('allowance'))) {
+          errorMessage = 'Approval required: For receiver-pays-gas mode, the sender must first approve your wallet address to spend tokens.';
+        }
+        
+        setState(prev => ({ ...prev, isLoading: false, error: errorMessage }));
         onRewardFailed?.(error);
       },
     },
@@ -159,14 +177,15 @@ const RewardButton: React.FC<RewardButtonProps> = ({
 
       // Step 1: Re-validate wallet connection state in real-time
       console.log('🔍 Checking current wallet connection state...');
+      console.log('  userPaysGas:', userPaysGas);
       console.log('  isConnected:', isConnected);
       console.log('  address:', address);
-      console.log('  requireConnection:', requireConnection);
+      console.log('  effectiveRequireConnection:', effectiveRequireConnection);
       
       // More robust wallet connection check
       const isCurrentlyConnected = isConnected && address;
       
-      if (requireConnection && !isCurrentlyConnected) {
+      if (effectiveRequireConnection && !isCurrentlyConnected) {
         console.log('❌ Wallet not connected or locked. Opening connection modal...');
         setPendingReward(true);
         setState(prev => ({ ...prev, isLoading: false }));
@@ -175,11 +194,21 @@ const RewardButton: React.FC<RewardButtonProps> = ({
         return;
       }
 
-      // Step 2: Determine recipient address (connected wallet takes priority)
-      // Only use connected wallet address if wallet is actually connected
-      const finalRecipientAddress = isCurrentlyConnected ? address : recipientAddress;
+      // Step 2: Determine recipient address based on payment mode
+      let finalRecipientAddress: string | undefined;
+      
+      if (userPaysGas) {
+        // User pays gas - recipient is always the connected wallet
+        finalRecipientAddress = address;
+        console.log('🔄 User Pays Gas Mode: Using connected wallet as recipient');
+      } else {
+        // Sender pays gas - use connected wallet first, then fallback to recipientAddress
+        finalRecipientAddress = isCurrentlyConnected ? address : recipientAddress;
+        console.log('💰 Sender Pays Gas Mode: Using connected wallet or provided recipient');
+      }
       
       console.log('🚀 Final Recipient Address Determination:');
+      console.log('  Payment mode:', userPaysGas ? 'User Pays Gas' : 'Sender Pays Gas');
       console.log('  Wallet currently connected:', isCurrentlyConnected);
       console.log('  Connected wallet address:', address);
       console.log('  Provided recipientAddress:', recipientAddress);
@@ -188,17 +217,21 @@ const RewardButton: React.FC<RewardButtonProps> = ({
       
       // Step 3: Validate recipient address is available
       if (isRewardMode && !finalRecipientAddress) {
+        const errorMessage = userPaysGas 
+          ? 'User pays gas mode requires wallet connection. Please connect your wallet.'
+          : 'No recipient address available. Please connect your wallet or provide a recipientAddress prop.';
+        
         setState(prev => ({
           ...prev,
           isLoading: false,
-          error: 'No recipient address available. Please connect your wallet or provide a recipientAddress prop.',
+          error: errorMessage,
         }));
-        onRewardFailed?.(new Error('No recipient address available'));
+        onRewardFailed?.(new Error(errorMessage));
         return;
       }
 
       // Step 4: Additional validation for connected wallet mode
-      if (requireConnection && !isCurrentlyConnected) {
+      if (effectiveRequireConnection && !isCurrentlyConnected) {
         setState(prev => ({
           ...prev,
           isLoading: false,
@@ -225,51 +258,97 @@ const RewardButton: React.FC<RewardButtonProps> = ({
         amount: rewardAmount,
         senderAddress: senderAddress || address,
         tokenSymbol,
+        userPaysGas,
         usingSenderWallet: Boolean(senderAddress && senderPrivateKey),
         walletConnected: isCurrentlyConnected,
       });
 
-      // Step 6: Execute token transfer
-      if (senderAddress && senderPrivateKey && finalRecipientAddress) {
-        // Use sender wallet for token transfer
-        console.log('Using sender wallet for token transfer...');
-        await executeTokenTransferWithSenderWallet(
-          tokenAddress,
-          finalRecipientAddress,
-          rewardAmount,
-          senderPrivateKey,
-          rpcUrl || 'https://mainnet.infura.io/v3/your-infura-key'
-        );
-      } else if (executeTransfer && finalRecipientAddress && tokenAddress && rewardAmount && isCurrentlyConnected) {
-        // Use connected wallet for token transfer (only if still connected)
-        console.log('Using connected wallet for token transfer...');
+      // Step 6: Execute token transfer based on payment mode
+      if (userPaysGas) {
+        // User pays gas - use transferFrom pattern
+        console.log('🔄 User pays gas: Using transferFrom pattern...');
         
-        // Double-check wallet is still connected before executing
         if (!isCurrentlyConnected) {
           setState(prev => ({
             ...prev,
             isLoading: false,
-            error: 'Wallet disconnected during transaction. Please reconnect.',
+            error: 'Wallet connection required for user-pays-gas mode.',
           }));
-          onRewardFailed?.(new Error('Wallet disconnected during transaction'));
+          onRewardFailed?.(new Error('Wallet connection required'));
           return;
         }
+
+        // Check if senderAddress is provided for transferFrom
+        if (!senderAddress) {
+          setState(prev => ({
+            ...prev,
+            isLoading: false,
+            error: 'Sender address required for user-pays-gas mode.',
+          }));
+          onRewardFailed?.(new Error('Sender address required'));
+          return;
+        }
+
+        // Use connected wallet to execute transferFrom
+        console.log('🔄 Executing transferFrom with connected wallet paying gas...');
+        console.log('  From (sender):', senderAddress);
+        console.log('  To (recipient):', finalRecipientAddress);
+        console.log('  Amount:', rewardAmount);
+        console.log('  Gas paid by:', address);
         
         executeTransfer({
           address: tokenAddress as `0x${string}`,
           abi: ERC20_ABI,
-          functionName: 'transfer',
-          args: [finalRecipientAddress as `0x${string}`, BigInt(rewardAmount)],
+          functionName: 'transferFrom',
+          args: [
+            senderAddress as `0x${string}`,      // From: sender wallet
+            finalRecipientAddress as `0x${string}`, // To: recipient (connected wallet)
+            BigInt(rewardAmount)                  // Amount
+          ],
         });
       } else {
-        // Simulate a transaction for demo purposes
-        console.log('Simulating token transfer for demo...');
-        setTimeout(() => {
-          const mockTxHash = '0x' + Math.random().toString(16).substr(2, 64);
-          console.log('Simulated transaction completed:', mockTxHash);
-          setState(prev => ({ ...prev, isLoading: false, error: null }));
-          onRewardClaimed?.(mockTxHash, rewardAmount || '0');
-        }, 2000);
+        // Sender pays gas - use original logic
+        if (senderAddress && senderPrivateKey && finalRecipientAddress) {
+          // Use sender wallet for token transfer
+          console.log('💰 Sender pays gas: Using sender wallet for token transfer...');
+          await executeTokenTransferWithSenderWallet(
+            tokenAddress,
+            finalRecipientAddress,
+            rewardAmount,
+            senderPrivateKey,
+            rpcUrl || 'https://mainnet.infura.io/v3/your-infura-key'
+          );
+        } else if (executeTransfer && finalRecipientAddress && tokenAddress && rewardAmount && isCurrentlyConnected) {
+          // Use connected wallet for token transfer (only if still connected)
+          console.log('💰 Sender pays gas: Using connected wallet for token transfer...');
+          
+          // Double-check wallet is still connected before executing
+          if (!isCurrentlyConnected) {
+            setState(prev => ({
+              ...prev,
+              isLoading: false,
+              error: 'Wallet disconnected during transaction. Please reconnect.',
+            }));
+            onRewardFailed?.(new Error('Wallet disconnected during transaction'));
+            return;
+          }
+          
+          executeTransfer({
+            address: tokenAddress as `0x${string}`,
+            abi: ERC20_ABI,
+            functionName: 'transfer',
+            args: [finalRecipientAddress as `0x${string}`, BigInt(rewardAmount)],
+          });
+        } else {
+          // Simulate a transaction for demo purposes
+          console.log('Simulating token transfer for demo...');
+          setTimeout(() => {
+            const mockTxHash = '0x' + Math.random().toString(16).substr(2, 64);
+            console.log('Simulated transaction completed:', mockTxHash);
+            setState(prev => ({ ...prev, isLoading: false, error: null }));
+            onRewardClaimed?.(mockTxHash, rewardAmount || '0');
+          }, 2000);
+        }
       }
 
     } catch (error) {
@@ -320,6 +399,38 @@ const RewardButton: React.FC<RewardButtonProps> = ({
 
     } catch (error) {
       console.error('Error in sender wallet transfer:', error);
+      throw error;
+    }
+  };
+
+  // Helper function to approve tokens for transferFrom (for development/testing)
+  const approveTokensForTransferFrom = async (
+    tokenAddress: string,
+    spenderAddress: string,
+    amount: string,
+    privateKey: string,
+    rpcUrl: string
+  ) => {
+    try {
+      const provider = new ethers.JsonRpcProvider(rpcUrl);
+      const wallet = new ethers.Wallet(privateKey, provider);
+      const contract = new ethers.Contract(tokenAddress, ERC20_ABI, wallet);
+
+      console.log('Approving tokens for transferFrom:', {
+        token: tokenAddress,
+        spender: spenderAddress,
+        amount: amount,
+      });
+
+      const tx = await contract.approve(spenderAddress, BigInt(amount));
+      console.log('Approval transaction submitted:', tx.hash);
+
+      const receipt = await tx.wait();
+      console.log('Approval confirmed:', receipt.transactionHash);
+
+      return receipt.transactionHash;
+    } catch (error) {
+      console.error('Error in token approval:', error);
       throw error;
     }
   };
@@ -425,6 +536,22 @@ const RewardButton: React.FC<RewardButtonProps> = ({
         </div>
       )}
 
+      {isRewardMode && userPaysGas && (
+        <div style={{ 
+          fontSize: '12px', 
+          color: '#2563eb', 
+          marginTop: '8px',
+          background: 'rgba(37, 99, 235, 0.1)',
+          border: '1px solid #2563eb',
+          borderRadius: '4px',
+          padding: '6px 8px',
+        }}>
+          <div>💰 You will pay gas fees for this transaction</div>
+          <div style={{ marginTop: '4px', fontSize: '11px', color: '#1e40af' }}>
+            ⚠️ Note: Sender must have pre-approved your wallet address to spend tokens
+          </div>
+        </div>
+      )}
     </>
   );
 };
