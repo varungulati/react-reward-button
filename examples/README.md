@@ -78,7 +78,7 @@ function App() {
       senderAddress={process.env.REACT_APP_SENDER_ADDRESS}
       senderPrivateKey={process.env.REACT_APP_SENDER_PRIVATE_KEY}
       rpcUrl={process.env.REACT_APP_RPC_URL}
-      tokenSymbol="USDC"
+      tokenSymbol="CRT"
       requireConnection={true}
       onRewardClaimed={(txHash, amount) => {
         console.log('Reward claimed!', { txHash, amount });
@@ -87,7 +87,7 @@ function App() {
         console.error('Reward failed:', error);
       }}
     >
-      Claim 10 USDC Reward
+      Claim 10 CRT Reward
     </RewardButton>
   );
 }

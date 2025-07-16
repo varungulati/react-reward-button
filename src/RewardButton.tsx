@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAccount, useConnect, useWriteContract } from 'wagmi';
+import { useAccount, useConnect, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { useAppKit } from '@reown/appkit/react';
 import { ethers } from 'ethers';
 import { Button } from './Button';
@@ -104,16 +104,20 @@ const RewardButton: React.FC<RewardButtonProps> = ({
     }
   }, [isConnected, address, pendingReward, isRewardMode]);
 
+  // Track transaction hash for confirmation
+  const [txHash, setTxHash] = useState<`0x${string}` | undefined>();
+
   // Contract write hook for executing the transaction (only if in reward mode)
   const { writeContract: executeTransfer, isPending: isTransactionLoading } = useWriteContract({
     mutation: {
-      onSuccess: (data: any) => {
-        console.log('✅ Transaction successful:', data);
-        setState(prev => ({ ...prev, isLoading: false, error: null }));
-        onRewardClaimed?.(data, rewardAmount || '0');
+      onSuccess: (hash: `0x${string}`) => {
+        console.log('📤 Transaction submitted to mempool:', hash);
+        console.log('⏳ Waiting for blockchain confirmation...');
+        setTxHash(hash);
+        // Don't call success callback yet - wait for confirmation
       },
       onError: (error: any) => {
-        console.error('❌ Transaction failed:', error);
+        console.error('❌ Transaction submission failed:', error);
         
         // Enhanced error handling for transferFrom failures
         let errorMessage = error.message || 'Transaction failed';
@@ -128,9 +132,55 @@ const RewardButton: React.FC<RewardButtonProps> = ({
         
         setState(prev => ({ ...prev, isLoading: false, error: errorMessage }));
         onRewardFailed?.(error);
+        setTxHash(undefined);
       },
     },
   });
+
+  // Wait for transaction confirmation
+  const { 
+    data: receipt, 
+    isLoading: isConfirming, 
+    isSuccess: isConfirmed,
+    isError: isConfirmError,
+    error: confirmError 
+  } = useWaitForTransactionReceipt({
+    hash: txHash,
+    query: {
+      enabled: !!txHash,
+    },
+  });
+
+  // Handle transaction confirmation results
+  useEffect(() => {
+    if (isConfirmed && receipt) {
+      console.log('✅ Transaction confirmed on blockchain:', receipt.transactionHash);
+      console.log('📊 Transaction status:', receipt.status === 'success' ? 'SUCCESS' : 'FAILED');
+      
+      if (receipt.status === 'success') {
+        setState(prev => ({ ...prev, isLoading: false, error: null }));
+        onRewardClaimed?.(receipt.transactionHash, rewardAmount || '0');
+      } else {
+        // Transaction was mined but failed
+        const errorMessage = 'Transaction failed on blockchain. This usually means insufficient allowance or balance.';
+        console.error('❌ Transaction failed on blockchain:', errorMessage);
+        setState(prev => ({ ...prev, isLoading: false, error: errorMessage }));
+        onRewardFailed?.(new Error(errorMessage));
+      }
+      setTxHash(undefined);
+    }
+  }, [isConfirmed, receipt, rewardAmount, onRewardClaimed, onRewardFailed]);
+
+  // Handle confirmation errors
+  useEffect(() => {
+    if (isConfirmError && confirmError) {
+      console.error('❌ Transaction confirmation error:', confirmError);
+      const errorMessage = 'Transaction confirmation failed. Please check the blockchain explorer.';
+      setState(prev => ({ ...prev, isLoading: false, error: errorMessage }));
+      onRewardFailed?.(confirmError);
+      setTxHash(undefined);
+    }
+  }, [isConfirmError, confirmError, onRewardFailed]);
 
   // Fetch token information (only if in reward mode)
   useEffect(() => {
@@ -286,20 +336,54 @@ const RewardButton: React.FC<RewardButtonProps> = ({
           return;
         }
 
-        // Check if senderAddress is provided for transferFrom
-        if (!senderAddress) {
-          const errorMessage = 'Sender address required for user-pays-gas mode.';
-          console.error('❌ Sender address required:', errorMessage);
+        // Check if senderAddress and senderPrivateKey are provided for transferFrom
+        if (!senderAddress || !senderPrivateKey) {
+          const errorMessage = 'Sender address and private key required for user-pays-gas mode.';
+          console.error('❌ Sender credentials required:', errorMessage);
           setState(prev => ({
             ...prev,
             isLoading: false,
             error: errorMessage,
           }));
-          onRewardFailed?.(new Error('Sender address required'));
+          onRewardFailed?.(new Error('Sender credentials required'));
           return;
         }
 
-        // Use connected wallet to execute transferFrom
+        // Step 6a: Auto-approve receiver using sender's private key
+        console.log('🔐 Auto-approving receiver wallet using sender credentials...');
+        console.log('  Sender approving:', senderAddress);
+        console.log('  Receiver being approved:', finalRecipientAddress);
+        console.log('  Amount to approve:', rewardAmount);
+        
+        try {
+          // Create provider and sender wallet
+          const provider = new ethers.JsonRpcProvider(rpcUrl || 'https://polygon-mainnet.infura.io/v3/your-key');
+          const senderWallet = new ethers.Wallet(senderPrivateKey, provider);
+          const tokenContract = new ethers.Contract(tokenAddress, ERC20_ABI, senderWallet);
+          
+          // Approve the receiver to spend tokens
+          console.log('📝 Submitting approval transaction...');
+          const approvalTx = await tokenContract.approve(finalRecipientAddress, BigInt(rewardAmount));
+          console.log('📤 Approval transaction submitted:', approvalTx.hash);
+          
+          // Wait for approval confirmation
+          console.log('⏳ Waiting for approval confirmation...');
+          await approvalTx.wait();
+          console.log('✅ Receiver approved successfully!');
+          
+        } catch (approvalError) {
+          console.error('❌ Approval failed:', approvalError);
+          const errorMessage = `Approval failed: ${approvalError instanceof Error ? approvalError.message : 'Unknown error'}`;
+          setState(prev => ({
+            ...prev,
+            isLoading: false,
+            error: errorMessage,
+          }));
+          onRewardFailed?.(approvalError instanceof Error ? approvalError : new Error(errorMessage));
+          return;
+        }
+
+        // Step 6b: Now execute transferFrom with connected wallet
         console.log('🔄 Executing transferFrom with connected wallet paying gas...');
         console.log('  From (sender):', senderAddress);
         console.log('  To (recipient):', finalRecipientAddress);
@@ -437,7 +521,7 @@ const RewardButton: React.FC<RewardButtonProps> = ({
     }
   };
 
-  const internalIsLoading = isRewardMode ? (state.isLoading || isTransactionLoading || pendingReward) : false;
+  const internalIsLoading = isRewardMode ? (state.isLoading || isTransactionLoading || isConfirming || pendingReward) : false;
   const finalIsLoading = externalIsLoading || internalIsLoading;
   const isButtonDisabled = disabled || (finalIsLoading && !pendingReward);
 
@@ -446,11 +530,14 @@ const RewardButton: React.FC<RewardButtonProps> = ({
     if (pendingReward) {
       return 'Connect Wallet...';
     }
+    if (isConfirming) {
+      return 'Confirming on Blockchain...';
+    }
     if (isTransactionLoading) {
-      return 'Confirming Transaction...';
+      return 'Submitting Transaction...';
     }
     if (state.isLoading) {
-      return 'Processing...';
+      return userPaysGas ? 'Approving & Processing...' : 'Processing...';
     }
     return loadingText;
   };
@@ -460,11 +547,14 @@ const RewardButton: React.FC<RewardButtonProps> = ({
     if (pendingReward) {
       return 'Connect Wallet...';
     }
+    if (isConfirming) {
+      return 'Confirming on Blockchain...';
+    }
     if (isTransactionLoading) {
-      return 'Confirming...';
+      return 'Submitting...';
     }
     if (state.isLoading) {
-      return 'Processing...';
+      return userPaysGas ? 'Approving & Processing...' : 'Processing...';
     }
     return children;
   };

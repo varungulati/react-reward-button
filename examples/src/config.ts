@@ -60,7 +60,7 @@ export const rewardConfig = {
 // For Polygon Mainnet:
 //   REACT_APP_NETWORK=polygon
 //   REACT_APP_RPC_URL=https://polygon-rpc.com
-//   REACT_APP_TOKEN_CONTRACT_ADDRESS=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174 (USDC on Polygon)
+//   REACT_APP_TOKEN_CONTRACT_ADDRESS=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174 (CRT on Polygon)
 //
 // For Polygon Mumbai Testnet:
 //   REACT_APP_NETWORK=mumbai

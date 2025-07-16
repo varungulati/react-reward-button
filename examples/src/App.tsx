@@ -4,7 +4,7 @@ import { mainnet, polygon, sepolia, polygonMumbai } from 'wagmi/chains';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createAppKit } from '@reown/appkit/react';
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
-import { RewardButton, Button, ethers } from 'react-reward-button';
+import { RewardButton, Button, ethers, ERC20_ABI } from 'react-reward-button';
 import rewardConfig from './config';
 import './App.css';
 
@@ -72,6 +72,27 @@ const wagmiConfig = wagmiAdapter.wagmiConfig;
 
 // Token address from environment variable
 const TOKEN_ADDRESS = rewardConfig.tokenAddress;
+
+// Helper function to approve receiver wallet (call this from browser console)
+// @ts-ignore
+window.approveReceiver = async (receiverAddress: string, amount: string = ethers.parseUnits('1000', 18).toString()) => {
+  try {
+    console.log('🔐 Approving receiver wallet...', { receiverAddress, amount });
+    const provider = new ethers.JsonRpcProvider(rewardConfig.rpcUrl);
+    const senderWallet = new ethers.Wallet(rewardConfig.senderPrivateKey, provider);
+    const tokenContract = new ethers.Contract(TOKEN_ADDRESS, ERC20_ABI, senderWallet);
+    
+    const tx = await tokenContract.approve(receiverAddress, amount);
+    console.log('📤 Approval transaction submitted:', tx.hash);
+    
+    const receipt = await tx.wait();
+    console.log('✅ Receiver approved successfully!', receipt.transactionHash);
+    return receipt;
+  } catch (error) {
+    console.error('❌ Approval failed:', error);
+    throw error;
+  }
+};
 
 function App() {
   const [rewardCount, setRewardCount] = useState(0);
@@ -194,6 +215,16 @@ REACT_APP_REOWN_PROJECT_ID=your-project-id
               <h2>Gas Payment Comparison</h2>
               <p>Compare sender-pays-gas vs receiver-pays-gas approaches</p>
               <div style={{ 
+                background: '#d4edda', 
+                border: '1px solid #28a745', 
+                borderRadius: '8px',
+                padding: '12px',
+                marginBottom: '16px',
+                fontSize: '14px'
+              }}>
+                <strong>✅ Auto-Approval Enabled:</strong> The receiver-pays-gas button now automatically approves the receiver using the sender's private key before requesting the transferFrom transaction.
+              </div>
+              <div style={{ 
                 background: '#e8f5e8', 
                 border: '1px solid #4caf50', 
                 borderRadius: '8px',
@@ -203,6 +234,48 @@ REACT_APP_REOWN_PROJECT_ID=your-project-id
               }}>
                 <strong>💡 Recommended:</strong> Use Polygon network for lowest gas fees and fastest transactions!
               </div>
+              
+              <div className="code-block">
+                <h3>How Auto-Approval Works:</h3>
+                <div style={{ 
+                  background: '#d4edda', 
+                  border: '1px solid #28a745', 
+                  borderRadius: '4px',
+                  padding: '8px',
+                  marginBottom: '8px',
+                  fontSize: '13px'
+                }}>
+                  <strong>🔄 Automatic Process:</strong> No manual approval needed - the component handles it automatically!
+                </div>
+                <pre style={{fontSize: '12px', marginBottom: '8px'}}>{`// When you click "Receiver Pays Gas" button:
+
+// Step 1: Auto-approve receiver (sender pays gas)
+const provider = new ethers.JsonRpcProvider(rpcUrl);
+const senderWallet = new ethers.Wallet(senderPrivateKey, provider);
+const tokenContract = new ethers.Contract(tokenAddress, ERC20_ABI, senderWallet);
+await tokenContract.approve(receiverAddress, amount);
+
+// Step 2: Execute transferFrom (receiver pays gas via MetaMask)
+await tokenContract.transferFrom(senderAddress, receiverAddress, amount);`}</pre>
+                
+                <h3>Manual Approval (Optional):</h3>
+                <div style={{ 
+                  background: '#fff3cd', 
+                  border: '1px solid #ffc107', 
+                  borderRadius: '4px',
+                  padding: '8px',
+                  marginBottom: '8px',
+                  fontSize: '13px'
+                }}>
+                  <strong>💡 Only needed for testing:</strong> Use browser console if you want to pre-approve manually
+                </div>
+                <pre style={{fontSize: '12px', marginBottom: '8px'}}>{`// Open browser console (F12) and run:
+await window.approveReceiver("0xc6eD273541EF03DfB8A58037dF7bC0311c07e597");
+
+// Or specify custom amount (default is 1000 tokens):
+await window.approveReceiver("0xYourReceiverWallet", "50000000000000000000"); // 50 tokens`}</pre>
+              </div>
+
               <div className="button-grid">
                 <div className="button-container">
                   <RewardButton
@@ -242,7 +315,7 @@ REACT_APP_REOWN_PROJECT_ID=your-project-id
                   >
                     👤 Receiver Pays Gas
                   </RewardButton>
-                  <span className="button-label">You pay gas fees</span>
+                  <span className="button-label">✅ Auto-approves receiver</span>
                 </div>
               </div>
               <div className="code-block">
@@ -250,7 +323,8 @@ REACT_APP_REOWN_PROJECT_ID=your-project-id
                 <ul style={{ margin: '8px 0', paddingLeft: '20px', fontSize: '14px' }}>
                   <li><strong>Sender Pays Gas:</strong> Uses <code>transfer()</code> function, sender wallet pays gas fees</li>
                   <li><strong>Receiver Pays Gas:</strong> Uses <code>transferFrom()</code> function, connected wallet pays gas fees</li>
-                  <li><strong>⚠️ Important:</strong> For receiver-pays-gas, sender must first call <code>approve(receiverAddress, amount)</code></li>
+                  <li><strong>✅ Auto-Approval:</strong> Receiver-pays-gas mode now automatically approves the receiver using sender credentials</li>
+                  <li><strong>🔄 Two-Step Process:</strong> 1) Auto-approve receiver (sender pays gas), 2) TransferFrom (receiver pays gas)</li>
                   <li><strong>🚀 Network Choice:</strong> Gas fees vary by blockchain - Polygon offers the lowest costs and fastest confirmations</li>
                 </ul>
               </div>
