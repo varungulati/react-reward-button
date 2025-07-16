@@ -34,6 +34,7 @@ const RewardButton: React.FC<RewardButtonProps> = ({
     isLoading: false,
     error: null,
     tokenInfo: null,
+    isSuccess: false,
   });
 
   const [pendingReward, setPendingReward] = useState(false);
@@ -169,8 +170,13 @@ const RewardButton: React.FC<RewardButtonProps> = ({
       console.log('📊 Transaction status:', receipt.status === 'success' ? 'SUCCESS' : 'FAILED');
       
       if (receipt.status === 'success') {
-        setState(prev => ({ ...prev, isLoading: false, error: null }));
+        setState(prev => ({ ...prev, isLoading: false, error: null, isSuccess: true }));
         onRewardClaimed?.(receipt.transactionHash, rewardAmount || '0');
+        
+        // Reset success state after 3 seconds
+        setTimeout(() => {
+          setState(prev => ({ ...prev, isSuccess: false }));
+        }, 3000);
       } else {
         // Transaction was mined but failed
         const errorMessage = 'Transaction failed on blockchain. This usually means insufficient allowance or balance.';
@@ -512,8 +518,13 @@ const RewardButton: React.FC<RewardButtonProps> = ({
           setTimeout(() => {
             const mockTxHash = '0x' + Math.random().toString(16).substr(2, 64);
             console.log('✅ Simulated transaction completed:', mockTxHash);
-            setState(prev => ({ ...prev, isLoading: false, error: null }));
+            setState(prev => ({ ...prev, isLoading: false, error: null, isSuccess: true }));
             onRewardClaimed?.(mockTxHash, rewardAmount || '0');
+            
+            // Reset success state after 3 seconds
+            setTimeout(() => {
+              setState(prev => ({ ...prev, isSuccess: false }));
+            }, 3000);
           }, 2000);
         }
       }
@@ -562,8 +573,13 @@ const RewardButton: React.FC<RewardButtonProps> = ({
       const receipt = await tx.wait();
       console.log('✅ Transaction confirmed:', receipt.transactionHash);
 
-      setState(prev => ({ ...prev, isLoading: false, error: null }));
+      setState(prev => ({ ...prev, isLoading: false, error: null, isSuccess: true }));
       onRewardClaimed?.(receipt.transactionHash, amount);
+      
+      // Reset success state after 3 seconds
+      setTimeout(() => {
+        setState(prev => ({ ...prev, isSuccess: false }));
+      }, 3000);
 
     } catch (error) {
       console.error('❌ Error in sender wallet transfer:', error);
@@ -619,7 +635,7 @@ const RewardButton: React.FC<RewardButtonProps> = ({
 
   const internalIsLoading = isRewardMode ? (state.isLoading || isTransactionLoading || isConfirming || pendingReward) : false;
   const finalIsLoading = externalIsLoading || internalIsLoading;
-  const isButtonDisabled = disabled || (finalIsLoading && !pendingReward);
+  const isButtonDisabled = disabled || (finalIsLoading && !pendingReward && !state.isSuccess);
 
   // Dynamic loading text based on current state
   const getLoadingText = () => {
@@ -640,6 +656,9 @@ const RewardButton: React.FC<RewardButtonProps> = ({
 
   // Dynamic button text based on state
   const getButtonText = () => {
+    if (state.isSuccess) {
+      return '🎉 Success!';
+    }
     if (pendingReward) {
       return 'Connect Wallet...';
     }
@@ -670,6 +689,7 @@ const RewardButton: React.FC<RewardButtonProps> = ({
         onClick={handleButtonClick}
         disabled={isButtonDisabled}
         isLoading={finalIsLoading}
+        isSuccess={state.isSuccess}
         loadingText={getLoadingText()}
       >
         {getButtonText()}

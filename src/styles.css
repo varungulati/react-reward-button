@@ -110,6 +110,157 @@
   pointer-events: none;
 }
 
+/* Success state - no background color change, just confetti effect */
+.reward-button--success {
+  position: relative;
+  overflow: visible;
+}
+
+/* Text transition effects */
+.reward-button {
+  transition: all 0.3s ease-in-out;
+}
+
+.reward-button__loading {
+  animation: reward-button-blur-in 0.2s ease-in-out;
+}
+
+.reward-button__text {
+  transition: all 0.2s ease-in-out;
+  filter: blur(0px);
+}
+
+.reward-button--loading .reward-button__text {
+  filter: blur(1px);
+  opacity: 0.8;
+}
+
+@keyframes reward-button-blur-in {
+  0% {
+    filter: blur(2px);
+    opacity: 0.5;
+  }
+  100% {
+    filter: blur(0px);
+    opacity: 1;
+  }
+}
+
+@keyframes reward-button-success-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-10px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(50px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes confetti-fall-left {
+  0% {
+    transform: translateY(-10px) translateX(0px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(50px) translateX(-30px) rotate(-180deg);
+    opacity: 0;
+  }
+}
+
+@keyframes confetti-fall-right {
+  0% {
+    transform: translateY(-10px) translateX(0px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(50px) translateX(30px) rotate(180deg);
+    opacity: 0;
+  }
+}
+
+.reward-button--success {
+  animation: reward-button-success-pulse 0.6s ease-in-out;
+}
+
+/* Confetti particles */
+.reward-button--success::before,
+.reward-button--success::after {
+  content: '🎉';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 16px;
+  pointer-events: none;
+  animation: confetti-fall 1.5s ease-out forwards;
+}
+
+.reward-button--success::after {
+  content: '✨';
+  animation: confetti-fall-left 1.2s ease-out forwards;
+  animation-delay: 0.2s;
+  left: 30%;
+}
+
+/* Additional confetti particles using spans */
+.reward-button__confetti {
+  position: absolute;
+  top: -10px;
+  left: 70%;
+  transform: translateX(-50%);
+  font-size: 14px;
+  pointer-events: none;
+  animation: confetti-fall-right 1.3s ease-out forwards;
+  animation-delay: 0.1s;
+}
+
+.reward-button__confetti::before {
+  content: '🎊';
+}
+
+.reward-button__confetti-2 {
+  position: absolute;
+  top: -10px;
+  left: 20%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  pointer-events: none;
+  animation: confetti-fall 1.4s ease-out forwards;
+  animation-delay: 0.3s;
+}
+
+.reward-button__confetti-2::before {
+  content: '⭐';
+}
+
+.reward-button__confetti-3 {
+  position: absolute;
+  top: -10px;
+  left: 80%;
+  transform: translateX(-50%);
+  font-size: 14px;
+  pointer-events: none;
+  animation: confetti-fall-left 1.6s ease-out forwards;
+  animation-delay: 0.4s;
+}
+
+.reward-button__confetti-3::before {
+  content: '🌟';
+}
+
 /* Loading spinner */
 .reward-button__loading {
   display: flex;

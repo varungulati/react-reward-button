@@ -12,6 +12,7 @@ export interface RewardButtonState {
   isLoading: boolean;
   error: string | null;
   tokenInfo: TokenInfo | null;
+  isSuccess: boolean;
 }
 
 // Enhanced RewardButton component props with Web3 functionality

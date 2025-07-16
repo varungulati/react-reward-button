@@ -24,6 +24,10 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
    * Custom text to show when loading
    */
   loadingText?: string;
+  /**
+   * Whether the button is in a success state
+   */
+  isSuccess?: boolean;
 }
 
 const buttonVariants = {
@@ -50,6 +54,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     asChild = false,
     isLoading = false,
     loadingText = 'Loading...',
+    isSuccess = false,
     disabled,
     children,
     ...props 
@@ -63,6 +68,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           buttonVariants.variant[variant],
           buttonVariants.size[size],
           isLoading && 'reward-button--loading',
+          isSuccess && 'reward-button--success',
           (disabled || isLoading) && 'reward-button--disabled',
           className
         )}
@@ -76,7 +82,16 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             {loadingText}
           </span>
         ) : (
-          children
+          <span className="reward-button__text">
+            {children}
+          </span>
+        )}
+        {isSuccess && (
+          <>
+            <span className="reward-button__confetti" />
+            <span className="reward-button__confetti-2" />
+            <span className="reward-button__confetti-3" />
+          </>
         )}
       </Comp>
     );
