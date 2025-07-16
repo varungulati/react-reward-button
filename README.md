@@ -2,6 +2,32 @@
 
 A React component that provides a reward button with Ethereum token rewards. Built with wagmi, AppKit, and ethers.js for seamless Web3 integration.
 
+## Why settle for clicks that do nothing?
+
+React Reward Button is a drop-in, beautifully styled button powered by shadcn/ui and Reown wallet integration — but with a twist: every click can reward your users with real tokens.
+
+### Unique Selling Points
+
+1. **🎨 Beautiful by Design**  
+   Built on top of shadcn/ui's Button component — fully customizable with variants, sizes, and accessible design patterns out of the box.
+
+2. **🔗 Seamless Wallet Integration with Reown**  
+   Handles wallet connection automatically using the Reown React library. Users connect once and are ready to receive rewards instantly.
+
+3. **🪙 Compatible with Any ERC-20 Token**  
+   Reward users in your own token or any existing ERC-20 token on supported EVM chains (Polygon recommended).
+
+4. **⚡ One Click = Real Value**  
+   Trigger token rewards instantly when users interact with the button — perfect for gamified actions, engagement campaigns, or loyalty flows.
+
+5. **⚙️ Flexible Gas Modes**  
+   Choose how rewards are delivered:
+   - Developer-funded (gasless for user)
+   - Or user-funded (MetaMask/Reown confirmation per claim)
+
+6. **🧩 Plug-and-Play Integration**  
+   Drop it into any React project like a regular button. Add reward props, and you're done — no backend required unless you want one.
+
 ## Features
 
 - 🌐 **Web3 Integration**: Built with wagmi and AppKit for modern Web3 functionality
