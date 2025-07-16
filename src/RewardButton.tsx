@@ -50,34 +50,35 @@ const RewardButton: React.FC<RewardButtonProps> = ({
   // Check if connected - more robust validation
   const isWalletConnected = isConnected && address;
 
-  // For userPaysGas mode, always require wallet connection
-  const effectiveRequireConnection = userPaysGas ? true : requireConnection;
+  // 🔒 SECURITY FIX: ALWAYS require wallet connection for ANY reward transfers
+  const effectiveRequireConnection = isRewardMode ? true : requireConnection;
 
-  // Determine the target address for the reward (only relevant in reward mode)
-  // Priority: 1. Connected wallet address (if truly connected), 2. Provided recipientAddress
-  // No fallback address - will throw error if neither is available
+  // 🔒 SECURITY FIX: Never fall back to recipientAddress - always use connected wallet
   const targetAddress = isRewardMode ? (
-    (isWalletConnected ? address : null) ||  // Use connected wallet address first only if truly connected
-    recipientAddress     // Then use provided recipient address
+    isWalletConnected ? address : null  // Only use connected wallet, no fallback
   ) : undefined;
 
   // Debug logging for recipient address selection
   useEffect(() => {
     if (isRewardMode) {
-      console.log('🎯 Recipient Address Selection:');
+      console.log('🎯 Recipient Address Selection (Security Enhanced):');
       console.log('  userPaysGas:', userPaysGas);
       console.log('  isConnected:', isConnected);
       console.log('  Connected wallet address:', address);
       console.log('  Wallet truly connected:', isWalletConnected);
-      console.log('  Provided recipientAddress prop:', recipientAddress);
+      console.log('  Provided recipientAddress prop (IGNORED for security):', recipientAddress);
       console.log('  Final target address:', targetAddress);
-      console.log('  Using connected wallet:', isWalletConnected ? '✅ YES' : '❌ NO');
+      console.log('  Using connected wallet:', isWalletConnected ? '✅ YES' : '❌ NO - WILL PROMPT TO CONNECT');
       console.log('  Effective require connection:', effectiveRequireConnection);
+      
+      if (!isWalletConnected) {
+        console.log('🔒 SECURITY: Wallet not connected - transfers will be blocked');
+      }
     }
   }, [isConnected, address, recipientAddress, targetAddress, isRewardMode, isWalletConnected, userPaysGas, effectiveRequireConnection]);
 
-  // Show warning if no wallet connected and no recipient address provided
-  const needsWalletConnection = isRewardMode && !isWalletConnected && !recipientAddress && effectiveRequireConnection;
+  // 🔒 SECURITY FIX: Always require wallet connection for reward mode
+  const needsWalletConnection = isRewardMode && !isWalletConnected;
 
   // Effect to handle wallet connection and auto-proceed with reward claim
   useEffect(() => {
@@ -236,8 +237,10 @@ const RewardButton: React.FC<RewardButtonProps> = ({
       // More robust wallet connection check
       const isCurrentlyConnected = isConnected && address;
       
-      if (effectiveRequireConnection && !isCurrentlyConnected) {
+      // 🔒 SECURITY FIX: Always require wallet connection for ANY reward transfers
+      if (!isCurrentlyConnected) {
         console.log('❌ Wallet not connected or locked. Opening connection modal...');
+        console.log('🔒 SECURITY: Blocking transfer - wallet connection required');
         setPendingReward(true);
         setState(prev => ({ ...prev, isLoading: false }));
         // Open Reown AppKit wallet selection modal
@@ -245,32 +248,19 @@ const RewardButton: React.FC<RewardButtonProps> = ({
         return;
       }
 
-      // Step 2: Determine recipient address based on payment mode
-      let finalRecipientAddress: string | undefined;
+      // Step 2: 🔒 SECURITY FIX: Always use connected wallet address
+      const finalRecipientAddress = address;  // Always use connected wallet
       
-      if (userPaysGas) {
-        // User pays gas - recipient is always the connected wallet
-        finalRecipientAddress = address;
-        console.log('🔄 User Pays Gas Mode: Using connected wallet as recipient');
-      } else {
-        // Sender pays gas - use connected wallet first, then fallback to recipientAddress
-        finalRecipientAddress = isCurrentlyConnected ? address : recipientAddress;
-        console.log('💰 Sender Pays Gas Mode: Using connected wallet or provided recipient');
-      }
-      
-      console.log('🚀 Final Recipient Address Determination:');
+      console.log('🚀 Final Recipient Address Determination (Security Enhanced):');
       console.log('  Payment mode:', userPaysGas ? 'User Pays Gas' : 'Sender Pays Gas');
       console.log('  Wallet currently connected:', isCurrentlyConnected);
       console.log('  Connected wallet address:', address);
-      console.log('  Provided recipientAddress:', recipientAddress);
       console.log('  Final recipient address:', finalRecipientAddress);
-      console.log('  Address source:', isCurrentlyConnected ? 'Connected Wallet' : 'Provided Prop');
+      console.log('  Address source: Connected Wallet (recipientAddress prop ignored for security)');
       
       // Step 3: Validate recipient address is available
       if (isRewardMode && !finalRecipientAddress) {
-        const errorMessage = userPaysGas 
-          ? 'User pays gas mode requires wallet connection. Please connect your wallet.'
-          : 'No recipient address available. Please connect your wallet or provide a recipientAddress prop.';
+        const errorMessage = 'Wallet connection required for reward transfers. Please connect your wallet.';
         
         console.error('❌ No recipient address:', errorMessage);
         setState(prev => ({
