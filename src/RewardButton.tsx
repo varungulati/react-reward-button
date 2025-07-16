@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { AwesomeButton } from 'react-awesome-button';
 import { useAccount, useConnect, useWriteContract } from 'wagmi';
 import { useAppKit } from '@reown/appkit/react';
 import { ethers } from 'ethers';
+import { Button } from './Button';
 import { RewardButtonProps, RewardButtonState, TokenInfo } from './types';
 import { ERC20_ABI } from './constants';
 
@@ -13,25 +13,21 @@ const RewardButton: React.FC<RewardButtonProps> = ({
   senderAddress,
   senderPrivateKey,
   rpcUrl,
-  children = 'Button',
-  className = '',
-  style = {},
-  onPress,
+  onReward,
   onRewardClaimed,
   onRewardFailed,
   onRewardStarted,
-  disabled = false,
-  loadingText = 'Loading...',
   showRewardAmount = true,
   tokenSymbol = 'TOKEN',
   requireConnection = true,
-  useWeb3Modal = false, // Deprecated but kept for backwards compatibility
-  userPaysGas = false, // New prop - false means sender pays gas (default)
-  // Default awesome-button styling that matches the awesome-buttons page
-  type = 'primary',
-  size = 'medium',
-  ripple = true,
-  ...awesomeButtonProps
+  loadingText = 'Loading...',
+  userPaysGas = false, // false means sender pays gas (default)
+  isLoading: externalIsLoading = false,
+  children = 'Claim Reward',
+  variant = 'default',
+  size = 'default',
+  disabled = false,
+  ...buttonProps
 }) => {
   const [state, setState] = useState<RewardButtonState>({
     isLoading: false,
@@ -112,12 +108,12 @@ const RewardButton: React.FC<RewardButtonProps> = ({
   const { writeContract: executeTransfer, isPending: isTransactionLoading } = useWriteContract({
     mutation: {
       onSuccess: (data: any) => {
-        console.log('Transaction successful:', data);
+        console.log('✅ Transaction successful:', data);
         setState(prev => ({ ...prev, isLoading: false, error: null }));
         onRewardClaimed?.(data, rewardAmount || '0');
       },
       onError: (error: any) => {
-        console.error('Transaction failed:', error);
+        console.error('❌ Transaction failed:', error);
         
         // Enhanced error handling for transferFrom failures
         let errorMessage = error.message || 'Transaction failed';
@@ -153,12 +149,15 @@ const RewardButton: React.FC<RewardButtonProps> = ({
           name: `${tokenSymbol} Token`,
         };
 
+        console.log('📊 Token Info:', mockTokenInfo);
+
         setState(prev => ({
           ...prev,
           tokenInfo: mockTokenInfo,
           isLoading: false,
         }));
       } catch (error) {
+        console.error('❌ Failed to fetch token info:', error);
         setState(prev => ({
           ...prev,
           error: 'Failed to fetch token information',
@@ -174,6 +173,8 @@ const RewardButton: React.FC<RewardButtonProps> = ({
     try {
       setState(prev => ({ ...prev, isLoading: true, error: null }));
       onRewardStarted?.();
+
+      console.log('🚀 Starting reward claim process...');
 
       // Step 1: Re-validate wallet connection state in real-time
       console.log('🔍 Checking current wallet connection state...');
@@ -221,6 +222,7 @@ const RewardButton: React.FC<RewardButtonProps> = ({
           ? 'User pays gas mode requires wallet connection. Please connect your wallet.'
           : 'No recipient address available. Please connect your wallet or provide a recipientAddress prop.';
         
+        console.error('❌ No recipient address:', errorMessage);
         setState(prev => ({
           ...prev,
           isLoading: false,
@@ -232,10 +234,12 @@ const RewardButton: React.FC<RewardButtonProps> = ({
 
       // Step 4: Additional validation for connected wallet mode
       if (effectiveRequireConnection && !isCurrentlyConnected) {
+        const errorMessage = 'Wallet connection lost. Please reconnect your wallet.';
+        console.error('❌ Wallet connection lost:', errorMessage);
         setState(prev => ({
           ...prev,
           isLoading: false,
-          error: 'Wallet connection lost. Please reconnect your wallet.',
+          error: errorMessage,
         }));
         onRewardFailed?.(new Error('Wallet connection lost'));
         return;
@@ -243,16 +247,18 @@ const RewardButton: React.FC<RewardButtonProps> = ({
 
       // Step 5: Validate required parameters for token transfer
       if (!tokenAddress || !rewardAmount) {
+        const errorMessage = 'Missing token address or reward amount';
+        console.error('❌ Missing parameters:', errorMessage);
         setState(prev => ({
           ...prev,
           isLoading: false,
-          error: 'Missing token address or reward amount',
+          error: errorMessage,
         }));
-        onRewardFailed?.(new Error('Missing token address or reward amount'));
+        onRewardFailed?.(new Error(errorMessage));
         return;
       }
 
-      console.log('Initiating token transfer...', {
+      console.log('💫 Initiating token transfer...', {
         tokenAddress,
         recipientAddress: finalRecipientAddress,
         amount: rewardAmount,
@@ -269,10 +275,12 @@ const RewardButton: React.FC<RewardButtonProps> = ({
         console.log('🔄 User pays gas: Using transferFrom pattern...');
         
         if (!isCurrentlyConnected) {
+          const errorMessage = 'Wallet connection required for user-pays-gas mode.';
+          console.error('❌ Wallet required:', errorMessage);
           setState(prev => ({
             ...prev,
             isLoading: false,
-            error: 'Wallet connection required for user-pays-gas mode.',
+            error: errorMessage,
           }));
           onRewardFailed?.(new Error('Wallet connection required'));
           return;
@@ -280,10 +288,12 @@ const RewardButton: React.FC<RewardButtonProps> = ({
 
         // Check if senderAddress is provided for transferFrom
         if (!senderAddress) {
+          const errorMessage = 'Sender address required for user-pays-gas mode.';
+          console.error('❌ Sender address required:', errorMessage);
           setState(prev => ({
             ...prev,
             isLoading: false,
-            error: 'Sender address required for user-pays-gas mode.',
+            error: errorMessage,
           }));
           onRewardFailed?.(new Error('Sender address required'));
           return;
@@ -324,10 +334,12 @@ const RewardButton: React.FC<RewardButtonProps> = ({
           
           // Double-check wallet is still connected before executing
           if (!isCurrentlyConnected) {
+            const errorMessage = 'Wallet disconnected during transaction. Please reconnect.';
+            console.error('❌ Wallet disconnected:', errorMessage);
             setState(prev => ({
               ...prev,
               isLoading: false,
-              error: 'Wallet disconnected during transaction. Please reconnect.',
+              error: errorMessage,
             }));
             onRewardFailed?.(new Error('Wallet disconnected during transaction'));
             return;
@@ -341,10 +353,10 @@ const RewardButton: React.FC<RewardButtonProps> = ({
           });
         } else {
           // Simulate a transaction for demo purposes
-          console.log('Simulating token transfer for demo...');
+          console.log('🎭 Simulating token transfer for demo...');
           setTimeout(() => {
             const mockTxHash = '0x' + Math.random().toString(16).substr(2, 64);
-            console.log('Simulated transaction completed:', mockTxHash);
+            console.log('✅ Simulated transaction completed:', mockTxHash);
             setState(prev => ({ ...prev, isLoading: false, error: null }));
             onRewardClaimed?.(mockTxHash, rewardAmount || '0');
           }, 2000);
@@ -352,7 +364,7 @@ const RewardButton: React.FC<RewardButtonProps> = ({
       }
 
     } catch (error) {
-      console.error('Error in handleClaimReward:', error);
+      console.error('❌ Error in handleClaimReward:', error);
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
       setState(prev => ({
         ...prev,
@@ -372,6 +384,7 @@ const RewardButton: React.FC<RewardButtonProps> = ({
     rpcUrl: string
   ) => {
     try {
+      console.log('🔧 Creating provider and wallet...');
       // Create provider and wallet
       const provider = new ethers.JsonRpcProvider(rpcUrl);
       const wallet = new ethers.Wallet(privateKey, provider);
@@ -379,7 +392,7 @@ const RewardButton: React.FC<RewardButtonProps> = ({
       // Create contract instance
       const contract = new ethers.Contract(tokenAddress, ERC20_ABI, wallet);
 
-      console.log('Executing token transfer from sender wallet:', {
+      console.log('💸 Executing token transfer from sender wallet:', {
         from: wallet.address,
         to: recipientAddress,
         amount: amount,
@@ -388,59 +401,31 @@ const RewardButton: React.FC<RewardButtonProps> = ({
 
       // Execute the transfer
       const tx = await contract.transfer(recipientAddress, BigInt(amount));
-      console.log('Transaction submitted:', tx.hash);
+      console.log('📤 Transaction submitted:', tx.hash);
 
       // Wait for transaction confirmation
       const receipt = await tx.wait();
-      console.log('Transaction confirmed:', receipt.transactionHash);
+      console.log('✅ Transaction confirmed:', receipt.transactionHash);
 
       setState(prev => ({ ...prev, isLoading: false, error: null }));
       onRewardClaimed?.(receipt.transactionHash, amount);
 
     } catch (error) {
-      console.error('Error in sender wallet transfer:', error);
+      console.error('❌ Error in sender wallet transfer:', error);
       throw error;
     }
   };
 
-  // Helper function to approve tokens for transferFrom (for development/testing)
-  const approveTokensForTransferFrom = async (
-    tokenAddress: string,
-    spenderAddress: string,
-    amount: string,
-    privateKey: string,
-    rpcUrl: string
-  ) => {
-    try {
-      const provider = new ethers.JsonRpcProvider(rpcUrl);
-      const wallet = new ethers.Wallet(privateKey, provider);
-      const contract = new ethers.Contract(tokenAddress, ERC20_ABI, wallet);
-
-      console.log('Approving tokens for transferFrom:', {
-        token: tokenAddress,
-        spender: spenderAddress,
-        amount: amount,
-      });
-
-      const tx = await contract.approve(spenderAddress, BigInt(amount));
-      console.log('Approval transaction submitted:', tx.hash);
-
-      const receipt = await tx.wait();
-      console.log('Approval confirmed:', receipt.transactionHash);
-
-      return receipt.transactionHash;
-    } catch (error) {
-      console.error('Error in token approval:', error);
-      throw error;
-    }
-  };
-
-  const handleButtonPress = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleButtonClick = async () => {
     if (isRewardMode) {
-      handleClaimReward();
+      await handleClaimReward();
     } else {
-      // Regular button mode - call the onPress handler
-      onPress?.(event);
+      // Regular button mode - call the onReward handler
+      try {
+        await onReward?.();
+      } catch (error) {
+        console.error('❌ Error in onReward callback:', error);
+      }
     }
   };
 
@@ -452,8 +437,9 @@ const RewardButton: React.FC<RewardButtonProps> = ({
     }
   };
 
-  const isButtonLoading = isRewardMode ? (state.isLoading || isTransactionLoading || pendingReward) : false;
-  const isButtonDisabled = disabled || (isButtonLoading && !pendingReward);
+  const internalIsLoading = isRewardMode ? (state.isLoading || isTransactionLoading || pendingReward) : false;
+  const finalIsLoading = externalIsLoading || internalIsLoading;
+  const isButtonDisabled = disabled || (finalIsLoading && !pendingReward);
 
   // Dynamic loading text based on current state
   const getLoadingText = () => {
@@ -483,44 +469,18 @@ const RewardButton: React.FC<RewardButtonProps> = ({
     return children;
   };
 
-  // Enhanced button styling for clean awesome-buttons look
-  const rewardButtonStyle: React.CSSProperties = {
-    // Base styling for clean appearance
-    fontWeight: '500',
-    letterSpacing: '0.025em',
-    ...style,
-  };
-
-  // Enhanced button content with better spacing
-  const buttonContent = getButtonText();
-
-  // Create safe props object for AwesomeButton with enhanced defaults
-  const safeAwesomeButtonProps = {
-    type: type,
-    size: size,
-    className: `reward-button ${className}`,
-    style: rewardButtonStyle,
-    onPress: handleButtonPress,
-    disabled: isButtonDisabled,
-    ripple: ripple,
-    // Pass through all safe AwesomeButton props
-    href: awesomeButtonProps.href,
-    target: awesomeButtonProps.target,
-    visible: awesomeButtonProps.visible,
-    placeholder: awesomeButtonProps.placeholder,
-    before: awesomeButtonProps.before,
-    after: awesomeButtonProps.after,
-    active: awesomeButtonProps.active,
-    // Additional AwesomeButton properties (type-safe)
-    containerProps: awesomeButtonProps.containerProps,
-    cssModule: awesomeButtonProps.cssModule,
-  };
-
   return (
     <>
-      <AwesomeButton {...safeAwesomeButtonProps}>
-        {(isButtonLoading && !pendingReward) ? getLoadingText() : buttonContent}
-      </AwesomeButton>
+      <Button
+        {...buttonProps}
+        variant={variant}
+        size={size}
+        onClick={handleButtonClick}
+        disabled={isButtonDisabled}
+        isLoading={finalIsLoading}
+      >
+        {finalIsLoading ? getLoadingText() : getButtonText()}
+      </Button>
       
       {isRewardMode && state.error && (
         <div style={{ 

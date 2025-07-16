@@ -1,16 +1,17 @@
 # 🎁 React Reward Button
 
-A React component that provides a reward button with Ethereum token rewards. Perfect for gamification, loyalty programs, and user engagement in Web3 applications.
+A clean, minimal, and accessible React button component inspired by shadcn/ui. Perfect for reward systems, gamification, and user engagement.
 
 ## Features
 
 - 🚀 **Easy to use**: Simple React component with minimal setup
-- 🔧 **Highly customizable**: Customize styles, text, and behavior
-- 🔗 **Web3 integrated**: Built-in wallet connection and Ethereum integration
+- 🔧 **Highly customizable**: Multiple variants, sizes, and full style control
+- 🎨 **Beautiful UI**: Modern, accessible design with smooth animations
 - 📱 **Mobile friendly**: Responsive design that works on all devices
-- 🎨 **Beautiful UI**: Modern, sleek design with smooth animations
 - 🔒 **Type safe**: Full TypeScript support
-- ⚡ **Performance optimized**: Efficient rendering and minimal bundle size
+- ⚡ **Performance optimized**: Minimal bundle size with zero external dependencies
+- ♿ **Accessible**: Built with accessibility in mind (ARIA labels, keyboard navigation)
+- 🎯 **Framework agnostic**: Works with any React app (no Tailwind required)
 
 ## Installation
 
@@ -18,57 +19,19 @@ A React component that provides a reward button with Ethereum token rewards. Per
 npm install react-reward-button
 ```
 
-## Prerequisites
-
-Your application needs to be wrapped with the necessary Web3 providers. Here's a basic setup:
-
-```jsx
-import { WagmiConfig, createConfig, mainnet } from 'wagmi';
-import { ConnectKitProvider, getDefaultConfig } from 'connectkit';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
-const queryClient = new QueryClient();
-
-const config = createConfig(
-  getDefaultConfig({
-    appName: 'Your App Name',
-    walletConnectProjectId: 'your-project-id',
-    chains: [mainnet],
-  })
-);
-
-function App() {
-  return (
-    <WagmiConfig config={config}>
-      <QueryClientProvider client={queryClient}>
-        <ConnectKitProvider>
-          {/* Your app components */}
-        </ConnectKitProvider>
-      </QueryClientProvider>
-    </WagmiConfig>
-  );
-}
-```
-
 ## Quick Start
 
 ```jsx
-import { RewardButton, ethers } from 'react-reward-button';
+import { RewardButton } from 'react-reward-button';
 
 function MyComponent() {
+  const handleReward = async () => {
+    // Your reward logic here
+    console.log('Reward claimed!');
+  };
+
   return (
-    <RewardButton
-      tokenAddress="0x..." // Your token contract address
-      rewardAmount={ethers.parseUnits('10', 18).toString()} // 10 tokens
-      onRewardClaimed={(txHash, amount) => {
-        console.log('Reward claimed!', txHash, amount);
-      }}
-      onRewardFailed={(error) => {
-        console.error('Reward failed:', error);
-      }}
-      tokenSymbol="USDC"
-      showRewardAmount={true}
-    >
+    <RewardButton onReward={handleReward}>
       Claim Reward
     </RewardButton>
   );
@@ -79,230 +42,249 @@ function MyComponent() {
 
 ### RewardButton Props
 
-| Prop | Type | Required | Description |
-|------|------|----------|-------------|
-| `tokenAddress` | `string` | ✅ | The Ethereum address of the reward token contract |
-| `rewardAmount` | `string` | ✅ | The amount of tokens to reward (in wei or token units) |
-| `recipientAddress` | `string` | ❌ | The recipient address for the reward (defaults to connected wallet) |
-| `children` | `React.ReactNode` | ❌ | Custom button text (defaults to "Claim Reward") |
-| `className` | `string` | ❌ | Custom CSS class name |
-| `style` | `React.CSSProperties` | ❌ | Custom inline styles |
-| `onRewardClaimed` | `(txHash: string, amount: string) => void` | ❌ | Callback when reward is successfully claimed |
-| `onRewardFailed` | `(error: Error) => void` | ❌ | Callback when reward claim fails |
-| `onRewardStarted` | `() => void` | ❌ | Callback when reward claim is initiated |
-| `disabled` | `boolean` | ❌ | Whether the button should be disabled |
-| `loadingText` | `string` | ❌ | Custom loading text (defaults to "Claiming...") |
-| `showRewardAmount` | `boolean` | ❌ | Whether to show the reward amount on the button |
-| `tokenSymbol` | `string` | ❌ | Custom token symbol to display (e.g., "USDC", "ETH") |
-| `requireConnection` | `boolean` | ❌ | Whether to require wallet connection before claiming |
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `onReward` | `() => void \| Promise<void>` | `undefined` | Callback function called when button is clicked |
+| `isLoading` | `boolean` | `false` | Whether the button is in loading state |
+| `children` | `React.ReactNode` | `"Claim Reward"` | Button content |
+| `variant` | `'default' \| 'secondary' \| 'outline' \| 'ghost' \| 'destructive'` | `'default'` | Button visual variant |
+| `size` | `'default' \| 'sm' \| 'lg' \| 'icon'` | `'default'` | Button size |
+| `disabled` | `boolean` | `false` | Whether the button is disabled |
+| `className` | `string` | `undefined` | Additional CSS classes |
+| `...props` | `ButtonHTMLAttributes` | - | All standard button HTML attributes |
+
+### Button Component
+
+For non-reward use cases, use the base `Button` component:
+
+```jsx
+import { Button } from 'react-reward-button';
+
+<Button onClick={handleClick} variant="outline">
+  Regular Button
+</Button>
+```
 
 ## Examples
 
 ### Basic Usage
 
 ```jsx
-import { RewardButton, ethers } from 'react-reward-button';
+import { RewardButton } from 'react-reward-button';
 
 function BasicExample() {
+  const handleReward = async () => {
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    alert('Reward claimed!');
+  };
+
   return (
-    <RewardButton
-      tokenAddress="0xA0b86a33E6441b6b07c2fE4c2b4B8B1d8B7a0F4c"
-      rewardAmount={ethers.parseUnits('10', 6).toString()} // 10 USDC
-      tokenSymbol="USDC"
-      onRewardClaimed={(txHash, amount) => {
-        alert(`Reward claimed! TX: ${txHash}`);
-      }}
-    >
-      Claim 10 USDC
+    <RewardButton onReward={handleReward}>
+      Claim Daily Reward
     </RewardButton>
   );
 }
 ```
 
-### Custom Styling
+### Different Variants
 
 ```jsx
-function CustomStyledExample() {
-  return (
-    <RewardButton
-      tokenAddress="0x6B175474E89094C44Da98b954EedeAC495271d0F"
-      rewardAmount={ethers.parseUnits('100', 18).toString()} // 100 DAI
-      tokenSymbol="DAI"
-      style={{
-        backgroundColor: '#ff6b6b',
-        borderRadius: '20px',
-        padding: '15px 30px',
-        fontSize: '18px',
-        boxShadow: '0 4px 15px rgba(255, 107, 107, 0.3)',
-      }}
-      onRewardClaimed={(txHash, amount) => {
-        console.log('DAI reward claimed!', txHash);
-      }}
-    >
-      🎉 Get DAI Bonus
-    </RewardButton>
-  );
-}
-```
-
-### Specific Recipient
-
-```jsx
-function SpecificRecipientExample() {
-  return (
-    <RewardButton
-      tokenAddress="0xA0b86a33E6441b6b07c2fE4c2b4B8B1d8B7a0F4c"
-      rewardAmount={ethers.parseUnits('25', 6).toString()} // 25 USDC
-      recipientAddress="0x742d35Cc6634C0532925a3b8D000a600DC21c4f0"
-      tokenSymbol="USDC"
-      requireConnection={false}
-      onRewardClaimed={(txHash, amount) => {
-        console.log('Sent to specific address!', txHash);
-      }}
-    >
-      Send to Friend
-    </RewardButton>
-  );
-}
-```
-
-### With Error Handling
-
-```jsx
-function ErrorHandlingExample() {
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(false);
+function VariantExample() {
+  const handleReward = async () => {
+    console.log('Reward claimed!');
+  };
 
   return (
-    <div>
-      <RewardButton
-        tokenAddress="0xA0b86a33E6441b6b07c2fE4c2b4B8B1d8B7a0F4c"
-        rewardAmount={ethers.parseUnits('5', 6).toString()}
-        tokenSymbol="USDC"
-        onRewardClaimed={(txHash, amount) => {
-          setSuccess(true);
-          setError(null);
-        }}
-        onRewardFailed={(error) => {
-          setError(error.message);
-          setSuccess(false);
-        }}
-      >
-        Claim Reward
+    <div style={{ display: 'flex', gap: '1rem' }}>
+      <RewardButton variant="default" onReward={handleReward}>
+        Default
       </RewardButton>
-      
-      {error && <p style={{ color: 'red' }}>Error: {error}</p>}
-      {success && <p style={{ color: 'green' }}>Reward claimed successfully!</p>}
+      <RewardButton variant="secondary" onReward={handleReward}>
+        Secondary
+      </RewardButton>
+      <RewardButton variant="outline" onReward={handleReward}>
+        Outline
+      </RewardButton>
+      <RewardButton variant="ghost" onReward={handleReward}>
+        Ghost
+      </RewardButton>
+      <RewardButton variant="destructive" onReward={handleReward}>
+        Destructive
+      </RewardButton>
     </div>
   );
 }
 ```
 
-## Token Amount Formatting
-
-The `rewardAmount` prop expects the amount in the smallest unit of the token (wei for 18-decimal tokens). Use `ethers.parseUnits()` to convert from human-readable amounts:
+### Different Sizes
 
 ```jsx
-// For 18-decimal tokens (like DAI, WETH)
-const amount = ethers.parseUnits('10', 18).toString(); // 10 tokens
+function SizeExample() {
+  const handleReward = async () => {
+    console.log('Reward claimed!');
+  };
 
-// For 6-decimal tokens (like USDC, USDT)
-const amount = ethers.parseUnits('10', 6).toString(); // 10 tokens
-
-// For 8-decimal tokens (like WBTC)
-const amount = ethers.parseUnits('0.1', 8).toString(); // 0.1 tokens
-```
-
-## Smart Contract Requirements
-
-Your token contract must:
-
-1. **Be an ERC20 token** with standard `transfer()` function
-2. **Have sufficient balance** to distribute rewards
-3. **Approve the reward distribution** (if using `transferFrom`)
-
-### Example Contract Setup
-
-```solidity
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
-
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-
-contract RewardToken is ERC20 {
-    constructor() ERC20("RewardToken", "REWARD") {
-        _mint(msg.sender, 1000000 * 10**18); // 1M tokens
-    }
-    
-    // Function to distribute rewards
-    function distributeReward(address recipient, uint256 amount) public {
-        require(balanceOf(msg.sender) >= amount, "Insufficient balance");
-        _transfer(msg.sender, recipient, amount);
-    }
+  return (
+    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+      <RewardButton size="sm" onReward={handleReward}>
+        Small
+      </RewardButton>
+      <RewardButton size="default" onReward={handleReward}>
+        Default
+      </RewardButton>
+      <RewardButton size="lg" onReward={handleReward}>
+        Large
+      </RewardButton>
+      <RewardButton size="icon" onReward={handleReward}>
+        🎁
+      </RewardButton>
+    </div>
+  );
 }
 ```
 
-## Security Considerations
-
-⚠️ **Important Security Notes:**
-
-1. **Test on testnets first** before deploying to mainnet
-2. **Verify token contracts** before using them
-3. **Implement proper access controls** in your smart contracts
-4. **Monitor gas costs** for your users
-5. **Consider rate limiting** to prevent abuse
-6. **Validate recipient addresses** to prevent loss of tokens
-
-## Supported Networks
-
-- Ethereum Mainnet
-- Polygon
-- Arbitrum
-- Optimism
-- Other EVM-compatible chains (configure through wagmi)
-
-## Common Token Addresses
+### Loading States
 
 ```jsx
-import { COMMON_TOKENS } from 'react-reward-button';
+function LoadingExample() {
+  const [isLoading, setIsLoading] = useState(false);
 
-// Ethereum Mainnet
-const tokens = {
-  USDC: COMMON_TOKENS.USDC,
-  USDT: COMMON_TOKENS.USDT,
-  DAI: COMMON_TOKENS.DAI,
-  WETH: COMMON_TOKENS.WETH,
-};
+  const handleReward = async () => {
+    setIsLoading(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      alert('Reward claimed!');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <RewardButton 
+      onReward={handleReward}
+      isLoading={isLoading}
+      variant="default"
+      size="lg"
+    >
+      {isLoading ? 'Processing...' : 'Claim Reward'}
+    </RewardButton>
+  );
+}
 ```
 
-## Development
+### Custom Content
 
-### Running the Example
+```jsx
+function CustomContentExample() {
+  const handleReward = async () => {
+    console.log('Premium reward claimed!');
+  };
 
-```bash
-# Install dependencies
-npm install
-
-# Build the package
-npm run build
-
-# Run the example
-cd examples
-npm install
-npm start
+  return (
+    <RewardButton onReward={handleReward} variant="secondary">
+      <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <span>💎</span>
+        <span>Premium Reward</span>
+        <span>🚀</span>
+      </span>
+    </RewardButton>
+  );
+}
 ```
 
-### Building
+### Using the Base Button Component
 
-```bash
-npm run build
+```jsx
+import { Button } from 'react-reward-button';
+
+function ButtonExample() {
+  return (
+    <div style={{ display: 'flex', gap: '1rem' }}>
+      <Button onClick={() => console.log('clicked')}>
+        Regular Button
+      </Button>
+      <Button variant="outline" disabled>
+        Disabled Button
+      </Button>
+      <Button variant="ghost" isLoading>
+        Loading Button
+      </Button>
+    </div>
+  );
+}
 ```
 
-### Testing
+## Styling
 
-```bash
-npm test
+### CSS Variables
+
+You can customize the button appearance using CSS variables:
+
+```css
+.reward-button {
+  --button-border-radius: 12px;
+  --button-font-weight: 600;
+}
+
+.reward-button--default {
+  --button-bg: #3b82f6;
+  --button-bg-hover: #2563eb;
+  --button-color: white;
+}
+
+.reward-button--secondary {
+  --button-bg: #f1f5f9;
+  --button-bg-hover: #e2e8f0;
+  --button-color: #1e293b;
+}
 ```
+
+### Custom Styles
+
+```jsx
+<RewardButton
+  onReward={handleReward}
+  style={{
+    backgroundColor: '#ff6b6b',
+    borderRadius: '20px',
+    padding: '12px 24px',
+    fontSize: '16px',
+    boxShadow: '0 4px 15px rgba(255, 107, 107, 0.3)',
+  }}
+>
+  Custom Styled Button
+</RewardButton>
+```
+
+### Custom Classes
+
+```jsx
+<RewardButton
+  onReward={handleReward}
+  className="my-custom-button"
+  variant="outline"
+>
+  Custom Class Button
+</RewardButton>
+```
+
+## Accessibility
+
+The component is built with accessibility in mind:
+
+- ✅ **Keyboard navigation**: Full keyboard support with proper focus management
+- ✅ **Screen readers**: ARIA labels and proper semantic HTML
+- ✅ **Focus indicators**: Clear focus states for keyboard users
+- ✅ **Loading states**: Proper loading indicators and disabled states
+- ✅ **Color contrast**: Meets WCAG accessibility standards
+
+## Browser Support
+
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
 
 ## Contributing
 
@@ -318,20 +300,9 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Support
 
-- 📧 **Email**: support@yourcompany.com
-- 💬 **Discord**: [Join our community](https://discord.gg/yourserver)
 - 🐛 **Issues**: [GitHub Issues](https://github.com/your-username/react-reward-button/issues)
-- 📖 **Documentation**: [Full docs](https://your-docs-site.com)
-
-## Changelog
-
-### v1.0.0
-- Initial release
-- Basic reward button functionality
-- Web3 integration with wagmi
-- TypeScript support
-- Comprehensive examples
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/your-username/react-reward-button/discussions)
 
 ---
 
-Made with ❤️ by [Your Name](https://github.com/your-username)
+Made with ❤️ for the React community

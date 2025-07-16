@@ -1,20 +1,31 @@
-// Main component export
+// Main component exports
+export { Button } from './Button';
 export { default as RewardButton } from './RewardButton';
 export { default } from './RewardButton';
 
 // Type exports
 export type { 
-  RewardButtonProps, 
-  RewardButtonState, 
-  TokenInfo 
+  ButtonProps, 
+  RewardButtonProps,
+  RewardButtonState,
+  TokenInfo
 } from './types';
+
+// Utility exports
+export { cn } from './utils';
 
 // Constants exports
 export { 
-  ERC20_ABI, 
-  COMMON_TOKENS, 
-  DEFAULT_STYLES 
+  ERC20_ABI,
+  COMMON_TOKENS,
+  BUTTON_VARIANTS,
+  BUTTON_SIZES,
+  DEFAULT_BUTTON_TEXT,
+  CSS_CLASSES
 } from './constants';
 
-// Re-export some useful utilities from ethers for convenience
-export { ethers } from 'ethers'; 
+// Re-export ethers for convenience
+export { ethers } from 'ethers';
+
+// Import and inject CSS styles
+import './styles.css'; 

@@ -1,22 +1,20 @@
+import { useState } from 'react';
 import { WagmiProvider } from 'wagmi';
 import { mainnet, polygon, sepolia, polygonMumbai } from 'wagmi/chains';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createAppKit } from '@reown/appkit/react';
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
-import { RewardButton } from 'react-reward-button';
-import { ethers } from 'ethers';
+import { RewardButton, Button, ethers } from 'react-reward-button';
 import rewardConfig from './config';
-import 'react-awesome-button/dist/styles.css';
 import './App.css';
 
 // Create a query client for React Query
 const queryClient = new QueryClient();
 
 // Configure project ID - you can get this from https://cloud.reown.com/
-// For demo purposes, we'll use a placeholder that won't make API calls
 const projectId = rewardConfig.reownProjectId;
 
-// ✅ Network selection based on REACT_APP_NETWORK environment variable
+// Network selection based on REACT_APP_NETWORK environment variable
 const getNetworkFromEnv = () => {
   const networkName = rewardConfig.network.toLowerCase();
   
@@ -58,11 +56,10 @@ createAppKit({
   projectId,
   metadata: {
     name: 'React Reward Button',
-    description: 'A reward button component with wallet selection',
+    description: 'A clean reward button component with Web3 integration',
     url: typeof window !== 'undefined' ? window.location.origin : 'https://github.com/your-repo',
     icons: ['https://avatars.githubusercontent.com/u/37784886'],
   },
-  // Disable features that require API calls if using placeholder project ID
   features: {
     analytics: projectId !== 'your-project-id-here',
     email: false,
@@ -77,21 +74,24 @@ const wagmiConfig = wagmiAdapter.wagmiConfig;
 const TOKEN_ADDRESS = rewardConfig.tokenAddress;
 
 function App() {
+  const [rewardCount, setRewardCount] = useState(0);
+
   const handleRewardClaimed = (txHash: string, amount: string) => {
-    console.log('Reward claimed!', { txHash, amount });
+    console.log('🎉 Reward claimed!', { txHash, amount });
+    setRewardCount(prev => prev + 1);
   };
 
   const handleRewardFailed = (error: Error) => {
-    console.error('Reward failed:', error);
+    console.error('❌ Reward failed:', error);
   };
 
   const handleRewardStarted = () => {
-    console.log('Reward transaction started');
+    console.log('🚀 Reward transaction started');
   };
 
   const handleRegularButtonPress = () => {
     console.log('Regular button pressed!');
-    alert('This is a regular AwesomeButton press!');
+    alert('This is a regular button press!');
   };
 
   return (
@@ -99,8 +99,8 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <div className="App">
           <header className="App-header">
-            <h1>AwesomeButton Types & Sizes</h1>
-            <p>Access all AwesomeButton features: types, sizes, ripple effects, and icons</p>
+            <h1>React Reward Button</h1>
+            <p>Clean, accessible button component with Web3 integration</p>
           </header>
 
           <main className="App-main">
@@ -110,20 +110,15 @@ function App() {
                 <strong>Sender Wallet Setup:</strong> The reward system uses a sender wallet to distribute tokens. 
                 Create a <code>.env</code> file in the examples directory with the following variables:
               </p>
-              <div style={{ 
-                background: '#f5f5f5', 
-                padding: '16px', 
-                borderRadius: '8px', 
-                fontFamily: 'monospace',
-                fontSize: '14px',
-                marginBottom: '16px'
-              }}>
-                <div>REACT_APP_SENDER_ADDRESS=0x742d35Cc6634C0532925a3b8D25c8c5c8A2B9E6D</div>
-                <div>REACT_APP_SENDER_PRIVATE_KEY=0x0123456789abcdef...</div>
-                <div>REACT_APP_NETWORK=polygon</div>
-                <div>REACT_APP_RPC_URL=https://polygon-mainnet.infura.io/v3/your-key</div>
-                <div>REACT_APP_TOKEN_CONTRACT_ADDRESS=0x0F35a94a4d...</div>
-                <div>REACT_APP_REOWN_PROJECT_ID=your-project-id</div>
+              <div className="code-block">
+                <pre>
+REACT_APP_SENDER_ADDRESS=0x742d35Cc6634C0532925a3b8D25c8c5c8A2B9E6D
+REACT_APP_SENDER_PRIVATE_KEY=0x0123456789abcdef...
+REACT_APP_NETWORK=polygon
+REACT_APP_RPC_URL=https://polygon-mainnet.infura.io/v3/your-key
+REACT_APP_TOKEN_CONTRACT_ADDRESS=0x0F35a94a4d...
+REACT_APP_REOWN_PROJECT_ID=your-project-id
+                </pre>
               </div>
               <div style={{ 
                 background: '#e8f5e8', 
@@ -135,199 +130,42 @@ function App() {
               }}>
                 <strong>💡 Network Recommendation:</strong> Polygon offers the lowest gas fees and fastest transaction confirmations compared to Ethereum mainnet.
               </div>
-              <p style={{ fontSize: '14px', color: '#666' }}>
-                <strong>⚠️ Security Note:</strong> Never commit private keys to version control. Use secure environment management in production.
-              </p>
             </div>
 
             <div className="example-section">
-              <h2>Basic Button Types</h2>
-              <div style={{ 
-                background: '#f8f9fa', 
-                padding: '16px', 
-                borderRadius: '8px', 
-                fontFamily: 'monospace',
-                fontSize: '14px',
-                marginBottom: '16px'
-              }}>
-                <div>import {`{ RewardButton }`} from 'react-reward-button';</div>
-                <br/>
-                <div>const Buttons = () =&gt; {`{`}</div>
-                <div>  return (</div>
-                <div>    &lt;RewardButton type="primary"&gt;Primary&lt;/RewardButton&gt;</div>
-                <div>    &lt;RewardButton type="secondary"&gt;Secondary&lt;/RewardButton&gt;</div>
-                <div>    &lt;RewardButton type="anchor"&gt;Anchor&lt;/RewardButton&gt;</div>
-                <div>    &lt;RewardButton type="danger"&gt;Danger&lt;/RewardButton&gt;</div>
-                <div>  );</div>
-                <div>{`}`}</div>
-              </div>
+              <h2>Button Variants & Sizes</h2>
+              <p>Clean shadcn/ui inspired design with multiple variants and sizes</p>
               <div className="button-grid">
                 <div className="button-container">
-                  <RewardButton type="primary" onPress={handleRegularButtonPress}>
-                    Primary
-                  </RewardButton>
+                  <Button variant="default" onClick={handleRegularButtonPress}>
+                    Default
+                  </Button>
+                  <span className="button-label">Default variant</span>
                 </div>
                 <div className="button-container">
-                  <RewardButton type="secondary" onPress={handleRegularButtonPress}>
+                  <Button variant="secondary" onClick={handleRegularButtonPress}>
                     Secondary
-                  </RewardButton>
+                  </Button>
+                  <span className="button-label">Secondary variant</span>
                 </div>
                 <div className="button-container">
-                  <RewardButton type="anchor" onPress={handleRegularButtonPress}>
-                    Anchor
-                  </RewardButton>
+                  <Button variant="outline" onClick={handleRegularButtonPress}>
+                    Outline
+                  </Button>
+                  <span className="button-label">Outline variant</span>
                 </div>
                 <div className="button-container">
-                  <RewardButton type="danger" onPress={handleRegularButtonPress}>
-                    Danger
-                  </RewardButton>
+                  <Button variant="ghost" onClick={handleRegularButtonPress}>
+                    Ghost
+                  </Button>
+                  <span className="button-label">Ghost variant</span>
                 </div>
               </div>
             </div>
 
             <div className="example-section">
-              <h2>Basic Button Types with Custom Icons</h2>
-              <div style={{ 
-                background: '#f8f9fa', 
-                padding: '16px', 
-                borderRadius: '8px', 
-                fontFamily: 'monospace',
-                fontSize: '14px',
-                marginBottom: '16px'
-              }}>
-                <div>import {`{ RewardButton }`} from 'react-reward-button';</div>
-                <div>import {`{ BeakerIcon, TrashIcon }`} from "@primer/octicons-react"; // custom icons</div>
-                <br/>
-                <div>const Buttons = () =&gt; {`{`}</div>
-                <div>  return (</div>
-                <div>    &lt;RewardButton type="primary" before={`{<⚡Icon />}`}&gt;Primary&lt;/RewardButton&gt;</div>
-                <div>    &lt;RewardButton type="secondary" after={`{<⚡Icon />}`}&gt;Secondary&lt;/RewardButton&gt;</div>
-                <div>    &lt;RewardButton type="anchor" size="icon"&gt;&lt;🗑️Icon /&gt;&lt;/RewardButton&gt;</div>
-                <div>  );</div>
-                <div>{`}`}</div>
-              </div>
-              <div className="button-grid">
-                <div className="button-container">
-                  <RewardButton 
-                    type="primary" 
-                    before={<span>⚡</span>}
-                    onPress={handleRegularButtonPress}
-                  >
-                    Primary
-                  </RewardButton>
-                </div>
-                <div className="button-container">
-                  <RewardButton 
-                    type="secondary" 
-                    after={<span>⚡</span>}
-                    onPress={handleRegularButtonPress}
-                  >
-                    Secondary
-                  </RewardButton>
-                </div>
-                <div className="button-container">
-                  <RewardButton 
-                    type="anchor" 
-                    size="icon"
-                    onPress={handleRegularButtonPress}
-                  >
-                    <span>🗑️</span>
-                  </RewardButton>
-                </div>
-              </div>
-            </div>
-
-            <div className="example-section">
-              <h2>Button Sizes & Ripple Effects</h2>
-              <p>Choose from small, medium, and large sizes with optional ripple effects</p>
-              <div className="button-grid">
-                <div className="button-container">
-                  <RewardButton 
-                    type="primary" 
-                    size="small" 
-                    ripple={true}
-                    before={<span>⚡</span>}
-                    onPress={handleRegularButtonPress}
-                  >
-                    Primary Small
-                  </RewardButton>
-                  <span className="button-label">Primary + Icon</span>
-                </div>
-                <div className="button-container">
-                  <RewardButton 
-                    type="secondary" 
-                    size="medium" 
-                    ripple={true}
-                    before={<span>🔥</span>}
-                    after={<span>✨</span>}
-                    onPress={handleRegularButtonPress}
-                  >
-                    Secondary Medium
-                  </RewardButton>
-                  <span className="button-label">Secondary + Icons</span>
-                </div>
-                <div className="button-container">
-                  <RewardButton 
-                    type="primary" 
-                    size="large" 
-                    ripple={true}
-                    before={<span>🚀</span>}
-                    active={true}
-                    onPress={handleRegularButtonPress}
-                  >
-                    Primary Large
-                  </RewardButton>
-                  <span className="button-label">Large + Active</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="example-section">
-              <h2>More Button Variants</h2>
-              <p>Explore different button types and visual styles</p>
-              <div className="button-grid">
-                <div className="button-container">
-                  <RewardButton 
-                    type="link" 
-                    size="medium" 
-                    ripple={true}
-                    before={<span>🔗</span>}
-                    onPress={handleRegularButtonPress}
-                  >
-                    Link Button
-                  </RewardButton>
-                  <span className="button-label">Link Type</span>
-                </div>
-                <div className="button-container">
-                  <RewardButton 
-                    type="anchor" 
-                    size="medium" 
-                    ripple={true}
-                    before={<span>⚓</span>}
-                    onPress={handleRegularButtonPress}
-                  >
-                    Anchor Button
-                  </RewardButton>
-                  <span className="button-label">Anchor Type</span>
-                </div>
-                <div className="button-container">
-                  <RewardButton 
-                    type="facebook" 
-                    size="medium" 
-                    ripple={true}
-                    before={<span>📘</span>}
-                    onPress={handleRegularButtonPress}
-                  >
-                    Facebook Style
-                  </RewardButton>
-                  <span className="button-label">Facebook Type</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="example-section">
-              <h2>Reward Button Mode</h2>
-              <p>When tokenAddress and rewardAmount are provided, the button becomes a reward button</p>
+              <h2>Web3 Reward Button - Sender Pays Gas</h2>
+              <p>When tokenAddress and rewardAmount are provided, the button becomes a Web3 reward button</p>
               <div className="single-button">
                 <RewardButton
                   tokenAddress={TOKEN_ADDRESS}
@@ -340,13 +178,15 @@ function App() {
                   onRewardStarted={handleRewardStarted}
                   tokenSymbol="CRT"
                   requireConnection={true}
-                  type="primary"
-                  size="large"
-                  before={<span>💰</span>}
-                  after={<span>🎁</span>}
+                  userPaysGas={false}
+                  variant="default"
+                  size="lg"
                 >
-                  Claim 10 USDC Reward
+                  🎁 Claim 10 CRT Reward
                 </RewardButton>
+              </div>
+              <div className="reward-count">
+                Total rewards claimed: {rewardCount}
               </div>
             </div>
 
@@ -377,12 +217,10 @@ function App() {
                     tokenSymbol="CRT"
                     requireConnection={true}
                     userPaysGas={false}
-                    type="primary"
-                    size="medium"
-                    before={<span>🏢</span>}
-                    after={<span>💰</span>}
+                    variant="default"
+                    size="default"
                   >
-                    Sender Pays Gas
+                    🏢 Sender Pays Gas
                   </RewardButton>
                   <span className="button-label">Sender pays gas fees</span>
                 </div>
@@ -399,47 +237,28 @@ function App() {
                     tokenSymbol="CRT"
                     requireConnection={true}
                     userPaysGas={true}
-                    type="secondary"
-                    size="medium"
-                    before={<span>👤</span>}
-                    after={<span>⛽</span>}
+                    variant="secondary"
+                    size="default"
                   >
-                    Receiver Pays Gas
+                    👤 Receiver Pays Gas
                   </RewardButton>
                   <span className="button-label">You pay gas fees</span>
                 </div>
               </div>
-              <div style={{ 
-                background: '#f8f9fa', 
-                padding: '16px', 
-                borderRadius: '8px', 
-                marginTop: '16px',
-                fontSize: '14px',
-                color: '#666'
-              }}>
-                <strong>Key Differences:</strong>
-                <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
+              <div className="code-block">
+                <h3>Key Differences:</h3>
+                <ul style={{ margin: '8px 0', paddingLeft: '20px', fontSize: '14px' }}>
                   <li><strong>Sender Pays Gas:</strong> Uses <code>transfer()</code> function, sender wallet pays gas fees</li>
                   <li><strong>Receiver Pays Gas:</strong> Uses <code>transferFrom()</code> function, connected wallet pays gas fees</li>
                   <li><strong>⚠️ Important:</strong> For receiver-pays-gas, sender must first call <code>approve(receiverAddress, amount)</code></li>
                   <li><strong>🚀 Network Choice:</strong> Gas fees vary by blockchain - Polygon offers the lowest costs and fastest confirmations</li>
                 </ul>
-                <div style={{ 
-                  background: '#fff3cd', 
-                  border: '1px solid #ffd60a', 
-                  borderRadius: '4px',
-                  padding: '8px',
-                  marginTop: '8px',
-                  fontSize: '12px'
-                }}>
-                  <strong>Testing Note:</strong> The receiver-pays-gas buttons will fail unless the sender has pre-approved your connected wallet address. In production, you would implement an approval mechanism.
-                </div>
               </div>
             </div>
 
             <div className="example-section">
-              <h2>Advanced Gas Payment Examples</h2>
-              <p>Different scenarios for gas payment handling</p>
+              <h2>Different Reward Amounts & Variants</h2>
+              <p>Different scenarios for reward distribution</p>
               <div className="button-grid">
                 <div className="button-container">
                   <RewardButton
@@ -454,13 +273,32 @@ function App() {
                     tokenSymbol="CRT"
                     requireConnection={true}
                     userPaysGas={false}
-                    type="primary"
-                    size="small"
-                    before={<span>🎁</span>}
+                    variant="outline"
+                    size="sm"
                   >
-                    Small Reward (Sender Pays)
+                    🎁 Small Reward (1 CRT)
                   </RewardButton>
                   <span className="button-label">Good for small amounts</span>
+                </div>
+                <div className="button-container">
+                  <RewardButton
+                    tokenAddress={TOKEN_ADDRESS}
+                    rewardAmount={ethers.parseUnits('25', 18).toString()}
+                    senderAddress={rewardConfig.senderAddress}
+                    senderPrivateKey={rewardConfig.senderPrivateKey}
+                    rpcUrl={rewardConfig.rpcUrl}
+                    onRewardClaimed={handleRewardClaimed}
+                    onRewardFailed={handleRewardFailed}
+                    onRewardStarted={handleRewardStarted}
+                    tokenSymbol="CRT"
+                    requireConnection={true}
+                    userPaysGas={false}
+                    variant="default"
+                    size="default"
+                  >
+                    💎 Medium Reward (25 CRT)
+                  </RewardButton>
+                  <span className="button-label">Good for medium amounts</span>
                 </div>
                 <div className="button-container">
                   <RewardButton
@@ -474,82 +312,104 @@ function App() {
                     onRewardStarted={handleRewardStarted}
                     tokenSymbol="CRT"
                     requireConnection={true}
-                    userPaysGas={true}
-                    type="primary"
-                    size="medium"
-                    before={<span>💎</span>}
+                    userPaysGas={false}
+                    variant="destructive"
+                    size="lg"
                   >
-                    Large Reward (User Pays)
+                    🚀 Large Reward (100 CRT)
                   </RewardButton>
                   <span className="button-label">Good for large amounts</span>
-                </div>
-                <div className="button-container">
-                  <RewardButton
-                    tokenAddress={TOKEN_ADDRESS}
-                    rewardAmount={ethers.parseUnits('10', 18).toString()}
-                    senderAddress={rewardConfig.senderAddress}
-                    senderPrivateKey={rewardConfig.senderPrivateKey}
-                    rpcUrl={rewardConfig.rpcUrl}
-                    onRewardClaimed={handleRewardClaimed}
-                    onRewardFailed={handleRewardFailed}
-                    onRewardStarted={handleRewardStarted}
-                    tokenSymbol="CRT"
-                    requireConnection={true}
-                    userPaysGas={true}
-                    type="secondary"
-                    size="medium"
-                    before={<span>🌟</span>}
-                    active={true}
-                  >
-                    Premium Claim
-                  </RewardButton>
-                  <span className="button-label">Self-service claim</span>
                 </div>
               </div>
             </div>
 
             <div className="example-section">
-              <h2>Customizable Styling</h2>
-              <p>Override default styling with custom CSS properties and themes</p>
+              <h2>Regular Button Examples</h2>
+              <p>Use the base Button component for non-Web3 use cases</p>
               <div className="button-grid">
                 <div className="button-container">
-                  <RewardButton 
-                    type="primary" 
-                    size="medium"
-                    before={<span>🎨</span>}
-                    style={{
-                      '--button-primary-color': '#ff6b6b',
-                      '--button-primary-color-dark': '#ff5252',
-                      '--button-primary-color-light': '#ff8a80',
-                      '--button-primary-color-hover': '#ff5252',
-                      borderRadius: '25px',
-                      fontWeight: 'bold',
-                    } as React.CSSProperties}
-                    onPress={handleRegularButtonPress}
+                  <Button 
+                    variant="default"
+                    onClick={handleRegularButtonPress}
                   >
-                    Custom Red
-                  </RewardButton>
-                  <span className="button-label">Custom CSS Variables</span>
+                    Regular Button
+                  </Button>
+                  <span className="button-label">No Web3 functionality</span>
                 </div>
                 <div className="button-container">
-                  <RewardButton 
-                    type="secondary" 
-                    size="medium"
-                    before={<span>🌈</span>}
-                    style={{
-                      '--button-secondary-color': '#4ecdc4',
-                      '--button-secondary-color-dark': '#26a69a',
-                      '--button-secondary-color-light': '#80cbc4',
-                      '--button-secondary-color-hover': '#26a69a',
-                      borderRadius: '12px',
-                      boxShadow: '0 4px 15px rgba(78, 205, 196, 0.3)',
-                    } as React.CSSProperties}
-                    onPress={handleRegularButtonPress}
+                  <Button 
+                    variant="secondary"
+                    onClick={handleRegularButtonPress}
+                    disabled
                   >
-                    Custom Teal
-                  </RewardButton>
-                  <span className="button-label">Custom Styling</span>
+                    Disabled Button
+                  </Button>
+                  <span className="button-label">Disabled state</span>
                 </div>
+                <div className="button-container">
+                  <Button 
+                    variant="ghost"
+                    onClick={handleRegularButtonPress}
+                    isLoading={true}
+                  >
+                    Loading Button
+                  </Button>
+                  <span className="button-label">Loading state</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="example-section">
+              <h2>Usage Examples</h2>
+              <div className="code-block">
+                <h3>Basic Web3 Reward Button:</h3>
+                <pre>{`import { RewardButton, ethers } from 'react-reward-button';
+
+<RewardButton
+  tokenAddress="0x..."
+  rewardAmount={ethers.parseUnits('10', 18).toString()}
+  senderAddress="0x..."
+  senderPrivateKey="0x..."
+  rpcUrl="https://polygon-mainnet.infura.io/v3/..."
+  onRewardClaimed={(txHash, amount) => {
+    console.log('Reward claimed!', txHash, amount);
+  }}
+  onRewardFailed={(error) => {
+    console.error('Reward failed:', error);
+  }}
+  tokenSymbol="CRT"
+  userPaysGas={false}
+  variant="default"
+  size="lg"
+>
+  Claim 10 CRT Reward
+</RewardButton>`}</pre>
+                
+                <h3>Regular Button:</h3>
+                <pre>{`import { Button } from 'react-reward-button';
+
+<Button 
+  variant="outline" 
+  onClick={() => console.log('clicked')}
+>
+  Click me
+</Button>`}</pre>
+              </div>
+            </div>
+
+            <div className="example-section">
+              <h2>Console Logging</h2>
+              <p>Open your browser's developer console to see detailed logging of all Web3 operations:</p>
+              <div className="code-block">
+                <ul style={{ margin: '8px 0', paddingLeft: '20px', fontSize: '14px' }}>
+                  <li>🎯 Recipient address selection logic</li>
+                  <li>🚀 Reward claim process steps</li>
+                  <li>🔍 Wallet connection validation</li>
+                  <li>💫 Token transfer initiation</li>
+                  <li>📤 Transaction submission</li>
+                  <li>✅ Transaction confirmation</li>
+                  <li>❌ Error handling with detailed messages</li>
+                </ul>
               </div>
             </div>
           </main>
@@ -557,6 +417,6 @@ function App() {
       </QueryClientProvider>
     </WagmiProvider>
   );
-  }
-  
-  export default App; 
+}
+
+export default App; 

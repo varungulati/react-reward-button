@@ -172,4 +172,50 @@ body {
   .example-section {
     padding: 1rem;
   }
+}
+
+/* Additional styles for the new example layout */
+.reward-count {
+  font-size: 0.875rem;
+  color: #10b981;
+  font-weight: 600;
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  background: rgba(16, 185, 129, 0.1);
+  border-radius: 1rem;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.code-block {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  border: 1px solid #e9ecef;
+}
+
+.code-block h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1.125rem;
+  color: #333;
+}
+
+.code-block pre {
+  background: #2d3748;
+  color: #e2e8f0;
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-family: 'Fira Code', 'Monaco', 'Menlo', monospace;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0.5rem 0;
+}
+
+.code-block pre:first-of-type {
+  margin-top: 0;
+}
+
+.code-block pre:last-of-type {
+  margin-bottom: 0;
 } 

@@ -1,0 +1,149 @@
+/* Base button styles */
+.reward-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+  outline: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.reward-button:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Variant styles */
+.reward-button--default {
+  background-color: #1f2937;
+  color: #ffffff;
+}
+
+.reward-button--default:hover:not(.reward-button--disabled) {
+  background-color: #374151;
+}
+
+.reward-button--secondary {
+  background-color: #f3f4f6;
+  color: #1f2937;
+  border-color: #e5e7eb;
+}
+
+.reward-button--secondary:hover:not(.reward-button--disabled) {
+  background-color: #e5e7eb;
+}
+
+.reward-button--outline {
+  background-color: transparent;
+  color: #1f2937;
+  border-color: #e5e7eb;
+}
+
+.reward-button--outline:hover:not(.reward-button--disabled) {
+  background-color: #f3f4f6;
+}
+
+.reward-button--ghost {
+  background-color: transparent;
+  color: #1f2937;
+  border-color: transparent;
+}
+
+.reward-button--ghost:hover:not(.reward-button--disabled) {
+  background-color: #f3f4f6;
+}
+
+.reward-button--destructive {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+
+.reward-button--destructive:hover:not(.reward-button--disabled) {
+  background-color: #b91c1c;
+}
+
+/* Size styles */
+.reward-button--size-default {
+  padding: 8px 16px;
+  height: 40px;
+  min-width: 64px;
+}
+
+.reward-button--size-sm {
+  padding: 4px 12px;
+  height: 32px;
+  min-width: 48px;
+  font-size: 12px;
+}
+
+.reward-button--size-lg {
+  padding: 12px 24px;
+  height: 48px;
+  min-width: 80px;
+  font-size: 16px;
+}
+
+.reward-button--size-icon {
+  padding: 0;
+  height: 40px;
+  width: 40px;
+  min-width: 40px;
+}
+
+/* Loading and disabled states */
+.reward-button--loading {
+  pointer-events: none;
+}
+
+.reward-button--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Loading spinner */
+.reward-button__loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reward-button__spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: reward-button-spin 1s linear infinite;
+}
+
+@keyframes reward-button-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .reward-button--size-default {
+    padding: 8px 12px;
+    min-width: 48px;
+  }
+  
+  .reward-button--size-lg {
+    padding: 10px 20px;
+    min-width: 64px;
+  }
+} 

@@ -1,31 +1,21 @@
-// Types are provided by web3modal and wagmi dependencies
+import React from 'react';
+import { ButtonProps } from './Button';
 
-// Types for AwesomeButton compatibility
-export interface AwesomeButtonProps {
-  type?: string;
-  size?: string;
-  disabled?: boolean;
-  visible?: boolean;
-  ripple?: boolean;
-  placeholder?: boolean;
-  onPress?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  onPressed?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  onReleased?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  onMouseDown?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  onMouseUp?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  href?: string;
-  className?: string;
-  style?: React.CSSProperties;
-  containerProps?: Record<string, unknown>;
-  cssModule?: Record<string, string>;
-  target?: string;
-  before?: React.ReactNode;
-  after?: React.ReactNode;
-  active?: boolean;
-  children?: React.ReactNode;
+// Web3 related types
+export interface TokenInfo {
+  symbol: string;
+  decimals: number;
+  name: string;
 }
 
-export interface RewardButtonProps extends AwesomeButtonProps {
+export interface RewardButtonState {
+  isLoading: boolean;
+  error: string | null;
+  tokenInfo: TokenInfo | null;
+}
+
+// Enhanced RewardButton component props with Web3 functionality
+export interface RewardButtonProps extends Omit<ButtonProps, 'onClick' | 'isLoading'> {
   /** The Ethereum address of the reward token contract (optional - if not provided, behaves as regular button) */
   tokenAddress?: string;
   /** The amount of tokens to reward (in wei or token units) (optional - if not provided, behaves as regular button) */
@@ -43,6 +33,11 @@ export interface RewardButtonProps extends AwesomeButtonProps {
   senderPrivateKey?: string;
   /** RPC URL for the network (optional - uses default if not provided) */
   rpcUrl?: string;
+  /** 
+   * Callback function called when the reward button is clicked (for non-Web3 mode)
+   * If tokenAddress and rewardAmount are provided, this is ignored in favor of Web3 functionality
+   */
+  onReward?: () => void | Promise<void>;
   /** Callback function called when reward is successfully claimed */
   onRewardClaimed?: (txHash: string, amount: string) => void;
   /** Callback function called when reward claim fails */
@@ -57,24 +52,20 @@ export interface RewardButtonProps extends AwesomeButtonProps {
   requireConnection?: boolean;
   /** Custom loading text for reward operations */
   loadingText?: string;
-  /** Whether to use Web3Modal for wallet connection instead of the default wagmi connect */
-  useWeb3Modal?: boolean;
   /** 
    * Whether the user (receiver) pays gas fees instead of sender
    * - true: Connected wallet pays gas fees (transferFrom pattern)
    * - false: Sender wallet pays gas fees (transfer pattern - default)
    */
   userPaysGas?: boolean;
+  /** Whether the button is in a loading state */
+  isLoading?: boolean;
+  /** 
+   * Content to display inside the button
+   * @default "Claim Reward"
+   */
+  children?: React.ReactNode;
 }
 
-export interface RewardButtonState {
-  isLoading: boolean;
-  error: string | null;
-  tokenInfo: TokenInfo | null;
-}
-
-export interface TokenInfo {
-  symbol: string;
-  decimals: number;
-  name: string;
-} 
+// Re-export types from component files
+export type { ButtonProps } from './Button'; 

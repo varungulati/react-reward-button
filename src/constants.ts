@@ -99,34 +99,31 @@ export const COMMON_TOKENS = {
   WETH: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
 } as const;
 
-// Default styles for the RewardButton component
-export const DEFAULT_STYLES = {
-  button: {
-    padding: '12px 24px',
-    fontSize: '16px',
-    fontWeight: 'bold',
-    borderRadius: '8px',
-    border: 'none',
-    cursor: 'pointer',
-    backgroundColor: '#3b82f6',
-    color: 'white',
-    transition: 'all 0.2s ease',
-  },
-  buttonClaimed: {
-    backgroundColor: '#10b981',
-  },
-  buttonLoading: {
-    opacity: 0.6,
-    cursor: 'not-allowed',
-  },
-  error: {
-    color: '#ef4444',
-    fontSize: '14px',
-    marginTop: '8px',
-  },
-  success: {
-    color: '#10b981',
-    fontSize: '14px',
-    marginTop: '8px',
-  },
+// Default button variant configurations
+export const BUTTON_VARIANTS = {
+  default: 'reward-button--default',
+  secondary: 'reward-button--secondary',
+  outline: 'reward-button--outline',
+  ghost: 'reward-button--ghost',
+  destructive: 'reward-button--destructive',
+} as const;
+
+// Default button size configurations
+export const BUTTON_SIZES = {
+  default: 'reward-button--size-default',
+  sm: 'reward-button--size-sm',
+  lg: 'reward-button--size-lg',
+  icon: 'reward-button--size-icon',
+} as const;
+
+// Default button text
+export const DEFAULT_BUTTON_TEXT = 'Claim Reward';
+
+// CSS class names
+export const CSS_CLASSES = {
+  base: 'reward-button',
+  loading: 'reward-button--loading',
+  disabled: 'reward-button--disabled',
+  loadingContent: 'reward-button__loading',
+  spinner: 'reward-button__spinner',
 } as const; 
