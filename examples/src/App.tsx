@@ -202,6 +202,10 @@ REACT_APP_REOWN_PROJECT_ID=your-project-id
                   userPaysGas={false}
                   variant="default"
                   size="lg"
+                  onClick={() => {
+                    console.log('🎁 Reward Button clicked! Regular button functionality before reward flow.');
+                    console.log('You can add custom logic here (analytics, validation, etc.) before the reward is processed.');
+                  }}
                 >
                   🎁 Claim 10 CRT Reward
                 </RewardButton>
@@ -292,6 +296,18 @@ await window.approveReceiver("0xYourReceiverWallet", "50000000000000000000"); //
                     userPaysGas={false}
                     variant="default"
                     size="default"
+                    onClick={(event) => {
+                      console.log('🏢 Sender-pays-gas button clicked!', event);
+                      // Example: Track analytics
+                      if (typeof window !== 'undefined' && (window as any).gtag) {
+                        (window as any).gtag('event', 'reward_button_click', {
+                          event_category: 'Web3',
+                          event_label: 'Sender Pays Gas',
+                          value: 5
+                        });
+                      }
+                      console.log('Sender pays gas - no approval needed');
+                    }}
                   >
                     🏢 Sender Pays Gas
                   </RewardButton>
@@ -312,6 +328,19 @@ await window.approveReceiver("0xYourReceiverWallet", "50000000000000000000"); //
                     userPaysGas={true}
                     variant="secondary"
                     size="default"
+                    onClick={(event) => {
+                      console.log('👤 Receiver-pays-gas button clicked!', event);
+                      // Example: Track analytics
+                      if (typeof window !== 'undefined' && (window as any).gtag) {
+                        (window as any).gtag('event', 'reward_button_click', {
+                          event_category: 'Web3',
+                          event_label: 'Receiver Pays Gas',
+                          value: 5
+                        });
+                      }
+                      // Example: Custom validation or business logic
+                      console.log('Running pre-reward validation and analytics...');
+                    }}
                   >
                     👤 Receiver Pays Gas
                   </RewardButton>
@@ -349,6 +378,18 @@ await window.approveReceiver("0xYourReceiverWallet", "50000000000000000000"); //
                     userPaysGas={false}
                     variant="outline"
                     size="sm"
+                    onClick={(event) => {
+                      console.log('🎁 Small reward button clicked! (1 CRT)', event);
+                      // Example: Track small reward analytics
+                      if (typeof window !== 'undefined' && (window as any).gtag) {
+                        (window as any).gtag('event', 'reward_button_click', {
+                          event_category: 'Web3',
+                          event_label: 'Small Reward',
+                          value: 1
+                        });
+                      }
+                      console.log('Processing small reward - efficient for micro-transactions');
+                    }}
                   >
                     🎁 Small Reward (1 CRT)
                   </RewardButton>
@@ -369,6 +410,18 @@ await window.approveReceiver("0xYourReceiverWallet", "50000000000000000000"); //
                     userPaysGas={false}
                     variant="default"
                     size="default"
+                    onClick={(event) => {
+                      console.log('💎 Medium reward button clicked! (25 CRT)', event);
+                      // Example: Track medium reward analytics
+                      if (typeof window !== 'undefined' && (window as any).gtag) {
+                        (window as any).gtag('event', 'reward_button_click', {
+                          event_category: 'Web3',
+                          event_label: 'Medium Reward',
+                          value: 25
+                        });
+                      }
+                      console.log('Processing medium reward - great for engagement rewards');
+                    }}
                   >
                     💎 Medium Reward (25 CRT)
                   </RewardButton>
@@ -389,6 +442,20 @@ await window.approveReceiver("0xYourReceiverWallet", "50000000000000000000"); //
                     userPaysGas={false}
                     variant="destructive"
                     size="lg"
+                    onClick={(event) => {
+                      console.log('🚀 Large reward button clicked! (100 CRT)', event);
+                      // Example: Track large reward analytics with special attention
+                      if (typeof window !== 'undefined' && (window as any).gtag) {
+                        (window as any).gtag('event', 'reward_button_click', {
+                          event_category: 'Web3',
+                          event_label: 'Large Reward',
+                          value: 100
+                        });
+                      }
+                      console.log('Processing large reward - high value transaction, extra validation recommended');
+                      // Example: Additional validation for high-value rewards
+                      console.log('⚠️ High value reward - consider additional confirmation steps');
+                    }}
                   >
                     🚀 Large Reward (100 CRT)
                   </RewardButton>
@@ -468,6 +535,49 @@ await window.approveReceiver("0xYourReceiverWallet", "50000000000000000000"); //
 >
   Click me
 </Button>`}</pre>
+                
+                <h3>RewardButton with onClick Handler:</h3>
+                <div style={{ 
+                  background: '#e8f5e8', 
+                  border: '1px solid #4caf50', 
+                  borderRadius: '8px',
+                  padding: '12px',
+                  marginBottom: '16px',
+                  fontSize: '14px'
+                }}>
+                  <strong>💡 Regular Button Behavior:</strong> The RewardButton supports regular onClick handlers that execute BEFORE the reward flow begins. This allows you to add analytics, validation, or any custom business logic while still benefiting from the Web3 reward functionality.
+                </div>
+                <pre>{`import { RewardButton, ethers } from 'react-reward-button';
+
+<RewardButton
+  tokenAddress="0x..."
+  rewardAmount={ethers.parseUnits('10', 18).toString()}
+  senderAddress="0x..."
+  senderPrivateKey="0x..."
+  rpcUrl="https://polygon-mainnet.infura.io/v3/..."
+  onRewardClaimed={(txHash, amount) => {
+    console.log('Reward claimed!', txHash, amount);
+  }}
+  tokenSymbol="CRT"
+  onClick={(event) => {
+    // Regular button functionality before reward flow
+    console.log('Button clicked - tracking analytics...');
+    
+    // Example: Track analytics
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'reward_button_click', {
+        event_category: 'Web3',
+        event_label: 'Reward Button',
+        value: 10
+      });
+    }
+    
+    // Example: Custom validation or business logic
+    console.log('Running pre-reward validation...');
+  }}
+>
+  🎁 Claim 10 CRT Reward
+</RewardButton>`}</pre>
               </div>
             </div>
 

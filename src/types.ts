@@ -15,7 +15,7 @@ export interface RewardButtonState {
 }
 
 // Enhanced RewardButton component props with Web3 functionality
-export interface RewardButtonProps extends Omit<ButtonProps, 'onClick' | 'isLoading'> {
+export interface RewardButtonProps extends Omit<ButtonProps, 'isLoading'> {
   /** The Ethereum address of the reward token contract (optional - if not provided, behaves as regular button) */
   tokenAddress?: string;
   /** The amount of tokens to reward (in wei or token units) (optional - if not provided, behaves as regular button) */

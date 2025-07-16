@@ -27,6 +27,7 @@ const RewardButton: React.FC<RewardButtonProps> = ({
   variant = 'default',
   size = 'default',
   disabled = false,
+  onClick,
   ...buttonProps
 }) => {
   const [state, setState] = useState<RewardButtonState>({
@@ -490,7 +491,14 @@ const RewardButton: React.FC<RewardButtonProps> = ({
     }
   };
 
-  const handleButtonClick = async () => {
+  const handleButtonClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    // Call the regular onClick handler first if provided
+    try {
+      await onClick?.(event);
+    } catch (error) {
+      console.error('❌ Error in onClick callback:', error);
+    }
+
     if (isRewardMode) {
       await handleClaimReward();
     } else {
