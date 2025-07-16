@@ -237,36 +237,72 @@ const RewardButton: React.FC<RewardButtonProps> = ({
 
       console.log('🚀 Starting reward claim process...');
 
-      // Step 1: Re-validate wallet connection state in real-time
-      console.log('🔍 Checking current wallet connection state...');
+      // Step 1: ROBUST REAL-TIME wallet connection validation
+      console.log('🔍 Performing real-time wallet connection validation...');
       console.log('  userPaysGas:', userPaysGas);
-      console.log('  isConnected:', isConnected);
-      console.log('  address:', address);
+      console.log('  isConnected (cached):', isConnected);
+      console.log('  address (cached):', address);
       console.log('  effectiveRequireConnection:', effectiveRequireConnection);
       
-      // More robust wallet connection check
-      const isCurrentlyConnected = isConnected && address;
+      // 🔒 SECURITY ENHANCEMENT: Perform real-time wallet connection check
+      let realTimeConnectionState = false;
+      let realTimeAddress = null;
       
-      // 🔒 SECURITY FIX: Always require wallet connection for ANY reward transfers
+      try {
+        // Check if MetaMask/wallet is available and connected
+        if (typeof window !== 'undefined' && (window as any).ethereum) {
+          // Request accounts to get real-time connection state
+          const accounts = await (window as any).ethereum.request({ method: 'eth_accounts' });
+          realTimeConnectionState = accounts && accounts.length > 0;
+          realTimeAddress = accounts && accounts.length > 0 ? accounts[0] : null;
+          
+          console.log('🔍 Real-time wallet check results:');
+          console.log('  Real-time connected:', realTimeConnectionState);
+          console.log('  Real-time address:', realTimeAddress);
+          console.log('  Cached vs Real-time match:', isConnected === realTimeConnectionState);
+        }
+      } catch (error) {
+        console.error('❌ Real-time wallet check failed:', error);
+        realTimeConnectionState = false;
+        realTimeAddress = null;
+      }
+      
+      // Use real-time connection state for security decisions
+      const isCurrentlyConnected = realTimeConnectionState && realTimeAddress;
+      const finalAddress = realTimeAddress || address;
+      
+      // 🔒 SECURITY FIX: Block ALL transfers if wallet is not connected in real-time
       if (!isCurrentlyConnected) {
-        console.log('❌ Wallet not connected or locked. Opening connection modal...');
-        console.log('🔒 SECURITY: Blocking transfer - wallet connection required');
-        setPendingReward(true);
+        console.log('❌ SECURITY BLOCK: Wallet not connected or locked in real-time check');
+        console.log('🔒 SECURITY: Blocking transfer - real-time wallet connection required');
+        console.log('🔄 UX: Falling back to "Claim Reward" button state - user must click again to connect');
+        setHasClickedOnce(true);  // Show "Claim Reward" button
         setState(prev => ({ ...prev, isLoading: false }));
-        // Open Reown AppKit wallet selection modal
-        openAppKit();
+        // Don't open modal immediately - let user choose when to connect
+        return;
+      }
+      
+      // Double-check that we have a valid address
+      if (!finalAddress) {
+        console.log('❌ SECURITY BLOCK: No valid wallet address available');
+        console.log('🔒 SECURITY: Blocking transfer - valid address required');
+        console.log('🔄 UX: Falling back to "Claim Reward" button state - user must click again to connect');
+        setHasClickedOnce(true);  // Show "Claim Reward" button
+        setState(prev => ({ ...prev, isLoading: false }));
+        // Don't open modal immediately - let user choose when to connect
         return;
       }
 
-      // Step 2: 🔒 SECURITY FIX: Always use connected wallet address
-      const finalRecipientAddress = address;  // Always use connected wallet
+      // Step 2: 🔒 SECURITY FIX: Always use real-time connected wallet address
+      const finalRecipientAddress = finalAddress;  // Always use real-time connected wallet
       
       console.log('🚀 Final Recipient Address Determination (Security Enhanced):');
       console.log('  Payment mode:', userPaysGas ? 'User Pays Gas' : 'Sender Pays Gas');
-      console.log('  Wallet currently connected:', isCurrentlyConnected);
-      console.log('  Connected wallet address:', address);
+      console.log('  Wallet currently connected (real-time):', isCurrentlyConnected);
+      console.log('  Real-time wallet address:', realTimeAddress);
+      console.log('  Cached wallet address:', address);
       console.log('  Final recipient address:', finalRecipientAddress);
-      console.log('  Address source: Connected Wallet (recipientAddress prop ignored for security)');
+      console.log('  Address source: Real-time Connected Wallet (recipientAddress prop ignored for security)');
       
       // Step 3: Validate recipient address is available
       if (isRewardMode && !finalRecipientAddress) {
@@ -299,6 +335,41 @@ const RewardButton: React.FC<RewardButtonProps> = ({
       if (!tokenAddress || !rewardAmount) {
         const errorMessage = 'Missing token address or reward amount';
         console.error('❌ Missing parameters:', errorMessage);
+        setState(prev => ({
+          ...prev,
+          isLoading: false,
+          error: errorMessage,
+        }));
+        onRewardFailed?.(new Error(errorMessage));
+        return;
+      }
+
+      // Step 6: FINAL security check - Re-validate wallet connection right before transfer
+      try {
+        if (typeof window !== 'undefined' && (window as any).ethereum) {
+          const finalCheck = await (window as any).ethereum.request({ method: 'eth_accounts' });
+          const finalConnectionState = finalCheck && finalCheck.length > 0;
+          
+          if (!finalConnectionState) {
+            const errorMessage = 'Wallet disconnected immediately before transaction. Please reconnect.';
+            console.error('❌ FINAL SECURITY CHECK FAILED:', errorMessage);
+            console.log('🔄 UX: Falling back to "Claim Reward" button state - user must click again to connect');
+            setState(prev => ({
+              ...prev,
+              isLoading: false,
+              error: errorMessage,
+            }));
+            onRewardFailed?.(new Error(errorMessage));
+            setHasClickedOnce(true);  // Show "Claim Reward" button
+            // Don't open modal immediately - let user choose when to connect
+            return;
+          }
+          
+          console.log('✅ FINAL SECURITY CHECK PASSED: Wallet still connected');
+        }
+      } catch (error) {
+        const errorMessage = 'Failed to verify wallet connection before transaction';
+        console.error('❌ FINAL SECURITY CHECK ERROR:', error);
         setState(prev => ({
           ...prev,
           isLoading: false,
@@ -513,11 +584,20 @@ const RewardButton: React.FC<RewardButtonProps> = ({
       if (!hasClickedOnce && !isWalletConnected) {
         console.log('🎯 First click - checking wallet connection...');
         setHasClickedOnce(true);
-        console.log('💡 Wallet not connected. Button text changed to "Claim Reward". Click again to start reward flow.');
+        console.log('💡 Wallet not connected. Button text changed to "Claim Reward". Click again to connect wallet.');
         return;
       }
       
-      // Second click or wallet already connected: Start reward flow
+      // Second click but wallet still not connected: Open wallet connection modal
+      if (hasClickedOnce && !isWalletConnected) {
+        console.log('🎯 Second click - opening wallet connection modal...');
+        console.log('🔗 User clicked "Claim Reward" button - opening Reown AppKit to connect wallet');
+        setPendingReward(true);
+        openAppKit();
+        return;
+      }
+      
+      // Wallet is connected: Start reward flow
       await handleClaimReward();
     } else {
       // Regular button mode - call the onReward handler
