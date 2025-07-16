@@ -37,6 +37,7 @@ const RewardButton: React.FC<RewardButtonProps> = ({
   });
 
   const [pendingReward, setPendingReward] = useState(false);
+  const [hasClickedOnce, setHasClickedOnce] = useState(false);
 
   // Determine if this is a reward button or regular button
   const isRewardMode = Boolean(tokenAddress && rewardAmount);
@@ -58,6 +59,14 @@ const RewardButton: React.FC<RewardButtonProps> = ({
   const targetAddress = isRewardMode ? (
     isWalletConnected ? address : null  // Only use connected wallet, no fallback
   ) : undefined;
+
+  // Reset hasClickedOnce when wallet gets connected
+  useEffect(() => {
+    if (isWalletConnected && hasClickedOnce) {
+      console.log('💡 Wallet connected - resetting click state');
+      setHasClickedOnce(false);
+    }
+  }, [isWalletConnected, hasClickedOnce]);
 
   // Debug logging for recipient address selection
   useEffect(() => {
@@ -500,6 +509,15 @@ const RewardButton: React.FC<RewardButtonProps> = ({
     }
 
     if (isRewardMode) {
+      // First click: Check wallet connection
+      if (!hasClickedOnce && !isWalletConnected) {
+        console.log('🎯 First click - checking wallet connection...');
+        setHasClickedOnce(true);
+        console.log('💡 Wallet not connected. Button text changed to "Claim Reward". Click again to start reward flow.');
+        return;
+      }
+      
+      // Second click or wallet already connected: Start reward flow
       await handleClaimReward();
     } else {
       // Regular button mode - call the onReward handler
@@ -554,6 +572,12 @@ const RewardButton: React.FC<RewardButtonProps> = ({
     if (state.isLoading) {
       return userPaysGas ? 'Approving & Processing...' : 'Processing...';
     }
+    
+    // Show "Claim Reward" if user clicked once but wallet is not connected
+    if (isRewardMode && hasClickedOnce && !isWalletConnected) {
+      return 'Claim Reward';
+    }
+    
     return children;
   };
 

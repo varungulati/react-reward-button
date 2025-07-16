@@ -187,6 +187,23 @@ REACT_APP_REOWN_PROJECT_ID=your-project-id
             <div className="example-section">
               <h2>Web3 Reward Button - Sender Pays Gas</h2>
               <p>When tokenAddress and rewardAmount are provided, the button becomes a Web3 reward button</p>
+              <div style={{ 
+                background: '#e8f5e8', 
+                border: '1px solid #4caf50', 
+                borderRadius: '8px',
+                padding: '12px',
+                marginBottom: '16px',
+                fontSize: '14px'
+              }}>
+                <strong>🎯 Two-Step Click Flow:</strong> RewardButton now implements a smart two-step flow:
+                <ol style={{ margin: '8px 0', paddingLeft: '20px' }}>
+                  <li><strong>First Click:</strong> Executes onClick handler + checks wallet connection</li>
+                  <li><strong>If not connected:</strong> Button text changes to "Claim Reward"</li>
+                  <li><strong>Second Click:</strong> Starts the actual reward flow</li>
+                  <li><strong>If wallet already connected:</strong> Goes directly to reward flow</li>
+                </ol>
+                Open browser console to see the click flow in action!
+              </div>
               <div className="single-button">
                 <RewardButton
                   tokenAddress={TOKEN_ADDRESS}
@@ -536,7 +553,7 @@ await window.approveReceiver("0xYourReceiverWallet", "50000000000000000000"); //
   Click me
 </Button>`}</pre>
                 
-                <h3>RewardButton with onClick Handler:</h3>
+                <h3>RewardButton with onClick Handler & Two-Step Flow:</h3>
                 <div style={{ 
                   background: '#e8f5e8', 
                   border: '1px solid #4caf50', 
@@ -545,7 +562,14 @@ await window.approveReceiver("0xYourReceiverWallet", "50000000000000000000"); //
                   marginBottom: '16px',
                   fontSize: '14px'
                 }}>
-                  <strong>💡 Regular Button Behavior:</strong> The RewardButton supports regular onClick handlers that execute BEFORE the reward flow begins. This allows you to add analytics, validation, or any custom business logic while still benefiting from the Web3 reward functionality.
+                  <strong>💡 Smart Two-Step Behavior:</strong> RewardButton now implements an intelligent two-step flow:
+                  <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
+                    <li><strong>First Click:</strong> onClick handler executes + wallet connection check</li>
+                    <li><strong>If wallet not connected:</strong> Button text changes to "Claim Reward"</li>
+                    <li><strong>Second Click:</strong> Actual reward flow begins</li>
+                    <li><strong>If wallet already connected:</strong> Direct to reward flow (single click)</li>
+                  </ul>
+                  This allows you to add analytics, validation, or custom business logic while providing a smooth user experience!
                 </div>
                 <pre>{`import { RewardButton, ethers } from 'react-reward-button';
 
@@ -560,7 +584,7 @@ await window.approveReceiver("0xYourReceiverWallet", "50000000000000000000"); //
   }}
   tokenSymbol="CRT"
   onClick={(event) => {
-    // Regular button functionality before reward flow
+    // This executes on FIRST click (before checking wallet connection)
     console.log('Button clicked - tracking analytics...');
     
     // Example: Track analytics
@@ -574,6 +598,9 @@ await window.approveReceiver("0xYourReceiverWallet", "50000000000000000000"); //
     
     // Example: Custom validation or business logic
     console.log('Running pre-reward validation...');
+    
+    // Note: If wallet not connected, button text will change to "Claim Reward"
+    // Second click will then start the actual reward flow
   }}
 >
   🎁 Claim 10 CRT Reward
