@@ -720,9 +720,6 @@ const RewardButton: React.FC<RewardButtonProps> = ({
           padding: '6px 8px',
         }}>
           <div>💰 You will pay gas fees for this transaction</div>
-          <div style={{ marginTop: '4px', fontSize: '11px', color: '#1e40af' }}>
-            ⚠️ Note: Sender must have pre-approved your wallet address to spend tokens
-          </div>
         </div>
       )}
     </>

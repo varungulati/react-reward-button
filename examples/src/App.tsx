@@ -128,31 +128,40 @@ function App() {
             {/* Hero Section - Use Case */}
             <div className="hero-section">
               <div className="hero-content">
-                <h2>Why use regular shadcn buttons when you can have superpowers?</h2>
+                <h2>Why settle for clicks that do nothing?</h2>
                 <p>
-                  RewardButton uses shadcn/ui Button under the hood, so you get all the beautiful design and accessibility features you love, 
-                  <strong> plus Web3 token rewards</strong>. Transform any user action into a rewarding experience.
+                  React Reward Button is a drop-in, beautifully styled button powered by shadcn/ui and Reown wallet integration — but with a twist: <strong>every click can reward your users with real tokens</strong>.
                 </p>
                 <div className="features-grid">
                   <div className="feature-card">
                     <div className="feature-icon">🎨</div>
-                    <h3>shadcn/ui Design</h3>
-                    <p>Beautiful, accessible buttons with all shadcn variants and sizes</p>
+                    <h3>Beautiful by Design</h3>
+                    <p>Built on top of shadcn/ui's Button component — fully customizable with variants, sizes, and accessible design patterns out of the box.</p>
+                  </div>
+                  <div className="feature-card">
+                    <div className="feature-icon">🔗</div>
+                    <h3>Seamless Wallet Integration with Reown</h3>
+                    <p>Handles wallet connection automatically using the Reown React library. Users connect once and are ready to receive rewards instantly.</p>
+                  </div>
+                  <div className="feature-card">
+                    <div className="feature-icon">🪙</div>
+                    <h3>Compatible with Any ERC-20 Token</h3>
+                    <p>Reward users in your own token or any existing ERC-20 token on supported EVM chains (Polygon recommended).</p>
                   </div>
                   <div className="feature-card">
                     <div className="feature-icon">⚡</div>
-                    <h3>Web3 Rewards</h3>
-                    <p>Distribute tokens seamlessly with gas-optimized transactions</p>
+                    <h3>One Click = Real Value</h3>
+                    <p>Trigger token rewards instantly when users interact with the button — perfect for gamified actions, engagement campaigns, or loyalty flows.</p>
                   </div>
                   <div className="feature-card">
-                    <div className="feature-icon">🔄</div>
-                    <h3>Smart Flow</h3>
-                    <p>Intelligent two-step flow with wallet connection handling</p>
+                    <div className="feature-icon">⚙️</div>
+                    <h3>Flexible Gas Modes</h3>
+                    <p>Choose how rewards are delivered: Developer-funded (gasless for user) or user-funded (MetaMask/Reown confirmation per claim).</p>
                   </div>
                   <div className="feature-card">
-                    <div className="feature-icon">🚀</div>
-                    <h3>Easy Integration</h3>
-                    <p>Drop-in replacement for regular buttons with powerful features</p>
+                    <div className="feature-icon">🧩</div>
+                    <h3>Plug-and-Play Integration</h3>
+                    <p>Drop it into any React project like a regular button. Add reward props, and you're done — no backend required unless you want one.</p>
                   </div>
                 </div>
               </div>
@@ -163,7 +172,8 @@ function App() {
               <h2>🎁 Core Functionality - Web3 Reward Button</h2>
               <p>The main feature: Transform clicks into token rewards with seamless Web3 integration</p>
               <div style={{ 
-                background: '#e8f5e8', 
+                background: '#1f2937', 
+                color: '#ffffff',
                 border: '1px solid #4caf50', 
                 borderRadius: '8px',
                 padding: '12px',
@@ -211,7 +221,8 @@ function App() {
               <h2>⚡ Gas Payment Options</h2>
               <p>Choose who pays the gas fees - sender or receiver</p>
               <div style={{ 
-                background: '#e8f5e8', 
+                background: '#1f2937', 
+                color: '#ffffff',
                 border: '1px solid #4caf50', 
                 borderRadius: '8px',
                 padding: '12px',
@@ -221,7 +232,7 @@ function App() {
                 <strong>💡 Network Recommendation:</strong> Use Polygon for lowest gas fees and fastest transactions!
               </div>
               
-              <div className="button-grid">
+              <div className="button-row">
                 <div className="button-container">
                   <RewardButton
                     tokenAddress={TOKEN_ADDRESS}
@@ -259,7 +270,7 @@ function App() {
                     tokenSymbol="CRT"
                     requireConnection={true}
                     userPaysGas={true}
-                    variant="secondary"
+                    variant="default"
                     size="default"
                     onClick={(event) => {
                       console.log('👤 Receiver-pays-gas button clicked!', event);
@@ -268,7 +279,6 @@ function App() {
                   >
                     👤 Receiver Pays Gas
                   </RewardButton>
-                  <span className="button-label">✅ Auto-approves receiver</span>
                 </div>
               </div>
             </div>

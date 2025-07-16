@@ -116,9 +116,16 @@ body {
 /* Features Grid */
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 2rem;
   margin-top: 3rem;
+}
+
+@media (max-width: 768px) {
+  .features-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
 }
 
 .feature-card {
@@ -202,20 +209,40 @@ body {
 /* Documentation Section */
 .docs-section {
   margin-top: 4rem;
-  padding-top: 2rem;
+  padding: 2rem;
   border-top: 2px solid rgba(102, 126, 234, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .docs-section > h2 {
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 2rem;
-  color: #333;
+  color: #1f2937;
   text-align: center;
+  
+  /* Gradient text with fallback */
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  
+  /* Fallback for browsers that don't support gradient text */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Fallback for browsers that don't support background-clip */
+@supports not (background-clip: text) {
+  .docs-section > h2 {
+    -webkit-text-fill-color: initial;
+    background: none;
+    color: #667eea;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  }
 }
 
 .docs-section .example-section {
