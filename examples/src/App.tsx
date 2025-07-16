@@ -120,8 +120,20 @@ function App() {
               }}>
                 <div>REACT_APP_SENDER_ADDRESS=0x742d35Cc6634C0532925a3b8D25c8c5c8A2B9E6D</div>
                 <div>REACT_APP_SENDER_PRIVATE_KEY=0x0123456789abcdef...</div>
-                <div>REACT_APP_RPC_URL=https://mainnet.infura.io/v3/your-key</div>
+                <div>REACT_APP_NETWORK=polygon</div>
+                <div>REACT_APP_RPC_URL=https://polygon-mainnet.infura.io/v3/your-key</div>
+                <div>REACT_APP_TOKEN_CONTRACT_ADDRESS=0x0F35a94a4d...</div>
                 <div>REACT_APP_REOWN_PROJECT_ID=your-project-id</div>
+              </div>
+              <div style={{ 
+                background: '#e8f5e8', 
+                border: '1px solid #4caf50', 
+                borderRadius: '8px',
+                padding: '12px',
+                marginBottom: '16px',
+                fontSize: '14px'
+              }}>
+                <strong>💡 Network Recommendation:</strong> Polygon offers the lowest gas fees and fastest transaction confirmations compared to Ethereum mainnet.
               </div>
               <p style={{ fontSize: '14px', color: '#666' }}>
                 <strong>⚠️ Security Note:</strong> Never commit private keys to version control. Use secure environment management in production.
@@ -319,14 +331,14 @@ function App() {
               <div className="single-button">
                 <RewardButton
                   tokenAddress={TOKEN_ADDRESS}
-                  rewardAmount={ethers.parseUnits('10', 6).toString()}
+                  rewardAmount={ethers.parseUnits('10', 18).toString()}
                   senderAddress={rewardConfig.senderAddress}
                   senderPrivateKey={rewardConfig.senderPrivateKey}
                   rpcUrl={rewardConfig.rpcUrl}
                   onRewardClaimed={handleRewardClaimed}
                   onRewardFailed={handleRewardFailed}
                   onRewardStarted={handleRewardStarted}
-                  tokenSymbol="USDC"
+                  tokenSymbol="CRT"
                   requireConnection={true}
                   type="primary"
                   size="large"
@@ -341,18 +353,28 @@ function App() {
             <div className="example-section">
               <h2>Gas Payment Comparison</h2>
               <p>Compare sender-pays-gas vs receiver-pays-gas approaches</p>
+              <div style={{ 
+                background: '#e8f5e8', 
+                border: '1px solid #4caf50', 
+                borderRadius: '8px',
+                padding: '12px',
+                marginBottom: '16px',
+                fontSize: '14px'
+              }}>
+                <strong>💡 Recommended:</strong> Use Polygon network for lowest gas fees and fastest transactions!
+              </div>
               <div className="button-grid">
                 <div className="button-container">
                   <RewardButton
                     tokenAddress={TOKEN_ADDRESS}
-                    rewardAmount={ethers.parseUnits('5', 6).toString()}
+                    rewardAmount={ethers.parseUnits('5', 18).toString()}
                     senderAddress={rewardConfig.senderAddress}
                     senderPrivateKey={rewardConfig.senderPrivateKey}
                     rpcUrl={rewardConfig.rpcUrl}
                     onRewardClaimed={handleRewardClaimed}
                     onRewardFailed={handleRewardFailed}
                     onRewardStarted={handleRewardStarted}
-                    tokenSymbol="USDC"
+                    tokenSymbol="CRT"
                     requireConnection={true}
                     userPaysGas={false}
                     type="primary"
@@ -362,19 +384,19 @@ function App() {
                   >
                     Sender Pays Gas
                   </RewardButton>
-                  <span className="button-label">Sender pays ~$0.18 gas</span>
+                  <span className="button-label">Sender pays gas fees</span>
                 </div>
                 <div className="button-container">
                   <RewardButton
                     tokenAddress={TOKEN_ADDRESS}
-                    rewardAmount={ethers.parseUnits('5', 6).toString()}
+                    rewardAmount={ethers.parseUnits('5', 18).toString()}
                     senderAddress={rewardConfig.senderAddress}
                     senderPrivateKey={rewardConfig.senderPrivateKey}
                     rpcUrl={rewardConfig.rpcUrl}
                     onRewardClaimed={handleRewardClaimed}
                     onRewardFailed={handleRewardFailed}
                     onRewardStarted={handleRewardStarted}
-                    tokenSymbol="USDC"
+                    tokenSymbol="CRT"
                     requireConnection={true}
                     userPaysGas={true}
                     type="secondary"
@@ -384,7 +406,7 @@ function App() {
                   >
                     Receiver Pays Gas
                   </RewardButton>
-                  <span className="button-label">You pay ~$0.18 gas</span>
+                  <span className="button-label">You pay gas fees</span>
                 </div>
               </div>
               <div style={{ 
@@ -400,6 +422,7 @@ function App() {
                   <li><strong>Sender Pays Gas:</strong> Uses <code>transfer()</code> function, sender wallet pays gas fees</li>
                   <li><strong>Receiver Pays Gas:</strong> Uses <code>transferFrom()</code> function, connected wallet pays gas fees</li>
                   <li><strong>⚠️ Important:</strong> For receiver-pays-gas, sender must first call <code>approve(receiverAddress, amount)</code></li>
+                  <li><strong>🚀 Network Choice:</strong> Gas fees vary by blockchain - Polygon offers the lowest costs and fastest confirmations</li>
                 </ul>
                 <div style={{ 
                   background: '#fff3cd', 
@@ -421,14 +444,14 @@ function App() {
                 <div className="button-container">
                   <RewardButton
                     tokenAddress={TOKEN_ADDRESS}
-                    rewardAmount={ethers.parseUnits('1', 6).toString()}
+                    rewardAmount={ethers.parseUnits('1', 18).toString()}
                     senderAddress={rewardConfig.senderAddress}
                     senderPrivateKey={rewardConfig.senderPrivateKey}
                     rpcUrl={rewardConfig.rpcUrl}
                     onRewardClaimed={handleRewardClaimed}
                     onRewardFailed={handleRewardFailed}
                     onRewardStarted={handleRewardStarted}
-                    tokenSymbol="USDC"
+                    tokenSymbol="CRT"
                     requireConnection={true}
                     userPaysGas={false}
                     type="primary"
@@ -442,14 +465,14 @@ function App() {
                 <div className="button-container">
                   <RewardButton
                     tokenAddress={TOKEN_ADDRESS}
-                    rewardAmount={ethers.parseUnits('100', 6).toString()}
+                    rewardAmount={ethers.parseUnits('100', 18).toString()}
                     senderAddress={rewardConfig.senderAddress}
                     senderPrivateKey={rewardConfig.senderPrivateKey}
                     rpcUrl={rewardConfig.rpcUrl}
                     onRewardClaimed={handleRewardClaimed}
                     onRewardFailed={handleRewardFailed}
                     onRewardStarted={handleRewardStarted}
-                    tokenSymbol="USDC"
+                    tokenSymbol="CRT"
                     requireConnection={true}
                     userPaysGas={true}
                     type="primary"
@@ -463,14 +486,14 @@ function App() {
                 <div className="button-container">
                   <RewardButton
                     tokenAddress={TOKEN_ADDRESS}
-                    rewardAmount={ethers.parseUnits('10', 6).toString()}
+                    rewardAmount={ethers.parseUnits('10', 18).toString()}
                     senderAddress={rewardConfig.senderAddress}
                     senderPrivateKey={rewardConfig.senderPrivateKey}
                     rpcUrl={rewardConfig.rpcUrl}
                     onRewardClaimed={handleRewardClaimed}
                     onRewardFailed={handleRewardFailed}
                     onRewardStarted={handleRewardStarted}
-                    tokenSymbol="USDC"
+                    tokenSymbol="CRT"
                     requireConnection={true}
                     userPaysGas={true}
                     type="secondary"
