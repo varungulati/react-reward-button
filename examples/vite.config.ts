@@ -31,7 +31,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     optimizeDeps: {
-      include: ['buffer', 'process', 'util'],
+      include: ['buffer', 'process', 'util', 'ethers'],
       exclude: ['stream']
     },
     build: {
