@@ -20,6 +20,10 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
    * Whether the button is in a loading state
    */
   isLoading?: boolean;
+  /**
+   * Custom text to show when loading
+   */
+  loadingText?: string;
 }
 
 const buttonVariants = {
@@ -45,6 +49,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     size = 'default',
     asChild = false,
     isLoading = false,
+    loadingText = 'Loading...',
     disabled,
     children,
     ...props 
@@ -68,7 +73,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {isLoading ? (
           <span className="reward-button__loading">
             <span className="reward-button__spinner" />
-            Loading...
+            {loadingText}
           </span>
         ) : (
           children

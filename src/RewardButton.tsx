@@ -20,7 +20,7 @@ const RewardButton: React.FC<RewardButtonProps> = ({
   showRewardAmount = true,
   tokenSymbol = 'TOKEN',
   requireConnection = true,
-  loadingText = 'Loading...',
+  loadingText = 'Claiming Reward...',
   userPaysGas = false, // false means sender pays gas (default)
   isLoading: externalIsLoading = false,
   children = 'Claim Reward',
@@ -630,10 +630,10 @@ const RewardButton: React.FC<RewardButtonProps> = ({
       return 'Confirming on Blockchain...';
     }
     if (isTransactionLoading) {
-      return 'Submitting Transaction...';
+      return 'Submitting Reward...';
     }
     if (state.isLoading) {
-      return userPaysGas ? 'Approving & Processing...' : 'Processing...';
+      return userPaysGas ? 'Approving & Claiming Reward...' : 'Claiming Reward...';
     }
     return loadingText;
   };
@@ -647,10 +647,10 @@ const RewardButton: React.FC<RewardButtonProps> = ({
       return 'Confirming on Blockchain...';
     }
     if (isTransactionLoading) {
-      return 'Submitting...';
+      return 'Submitting Reward...';
     }
     if (state.isLoading) {
-      return userPaysGas ? 'Approving & Processing...' : 'Processing...';
+      return userPaysGas ? 'Approving & Claiming Reward...' : 'Claiming Reward...';
     }
     
     // Show "Claim Reward" if user clicked once but wallet is not connected
@@ -670,8 +670,9 @@ const RewardButton: React.FC<RewardButtonProps> = ({
         onClick={handleButtonClick}
         disabled={isButtonDisabled}
         isLoading={finalIsLoading}
+        loadingText={getLoadingText()}
       >
-        {finalIsLoading ? getLoadingText() : getButtonText()}
+        {getButtonText()}
       </Button>
       
       {isRewardMode && state.error && (
