@@ -1,9 +1,8 @@
 // Configuration for the reward system
 // This file reads from environment variables for the sender wallet
 
-// Debug: Log ALL environment variables
+// Debug: Log environment variables
 console.log('🔍 Environment Variables Check:');
-console.log('All process.env:', process.env);
 console.log('REACT_APP_SENDER_ADDRESS:', process.env.REACT_APP_SENDER_ADDRESS);
 console.log('REACT_APP_SENDER_PRIVATE_KEY:', process.env.REACT_APP_SENDER_PRIVATE_KEY ? '[HIDDEN]' : 'undefined');
 console.log('REACT_APP_TOKEN_CONTRACT_ADDRESS:', process.env.REACT_APP_TOKEN_CONTRACT_ADDRESS);
