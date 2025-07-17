@@ -12,9 +12,24 @@ WORKDIR /app
 # Set production environment
 ENV NODE_ENV="production"
 
-
 # Throw-away build stage to reduce size of final image
 FROM base AS build
+
+# Accept environment variables as build arguments
+ARG REACT_APP_SENDER_ADDRESS
+ARG REACT_APP_SENDER_PRIVATE_KEY
+ARG REACT_APP_TOKEN_CONTRACT_ADDRESS
+ARG REACT_APP_NETWORK
+ARG REACT_APP_RPC_URL
+ARG REACT_APP_REOWN_PROJECT_ID
+
+# Set environment variables for the build process
+ENV REACT_APP_SENDER_ADDRESS=$REACT_APP_SENDER_ADDRESS
+ENV REACT_APP_SENDER_PRIVATE_KEY=$REACT_APP_SENDER_PRIVATE_KEY
+ENV REACT_APP_TOKEN_CONTRACT_ADDRESS=$REACT_APP_TOKEN_CONTRACT_ADDRESS
+ENV REACT_APP_NETWORK=$REACT_APP_NETWORK
+ENV REACT_APP_RPC_URL=$REACT_APP_RPC_URL
+ENV REACT_APP_REOWN_PROJECT_ID=$REACT_APP_REOWN_PROJECT_ID
 
 # Install packages needed to build node modules
 RUN apt-get update -qq && \
@@ -32,7 +47,6 @@ RUN npm run build
 
 # Remove development dependencies
 RUN npm prune --omit=dev
-
 
 # Final stage for app image
 FROM nginx
