@@ -20,13 +20,14 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       global: 'globalThis',
-      // Explicitly define environment variables - check both .env files and system env
-      'process.env.REACT_APP_SENDER_ADDRESS': JSON.stringify(getEnvVar('REACT_APP_SENDER_ADDRESS')),
-      'process.env.REACT_APP_SENDER_PRIVATE_KEY': JSON.stringify(getEnvVar('REACT_APP_SENDER_PRIVATE_KEY')),
-      'process.env.REACT_APP_TOKEN_CONTRACT_ADDRESS': JSON.stringify(getEnvVar('REACT_APP_TOKEN_CONTRACT_ADDRESS')),
-      'process.env.REACT_APP_NETWORK': JSON.stringify(getEnvVar('REACT_APP_NETWORK')),
-      'process.env.REACT_APP_RPC_URL': JSON.stringify(getEnvVar('REACT_APP_RPC_URL')),
-      'process.env.REACT_APP_REOWN_PROJECT_ID': JSON.stringify(getEnvVar('REACT_APP_REOWN_PROJECT_ID')),
+      // Vite automatically exposes VITE_ prefixed environment variables
+      // For deployment compatibility, we explicitly define them here
+      'import.meta.env.VITE_SENDER_ADDRESS': JSON.stringify(getEnvVar('VITE_SENDER_ADDRESS')),
+      'import.meta.env.VITE_SENDER_PRIVATE_KEY': JSON.stringify(getEnvVar('VITE_SENDER_PRIVATE_KEY')),
+      'import.meta.env.VITE_TOKEN_CONTRACT_ADDRESS': JSON.stringify(getEnvVar('VITE_TOKEN_CONTRACT_ADDRESS')),
+      'import.meta.env.VITE_NETWORK': JSON.stringify(getEnvVar('VITE_NETWORK')),
+      'import.meta.env.VITE_RPC_URL': JSON.stringify(getEnvVar('VITE_RPC_URL')),
+      'import.meta.env.VITE_REOWN_PROJECT_ID': JSON.stringify(getEnvVar('VITE_REOWN_PROJECT_ID')),
     },
     resolve: {
       alias: {

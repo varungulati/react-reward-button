@@ -10,26 +10,26 @@ Create a `.env` file in this directory with the following variables:
 
 ```bash
 # Sender wallet configuration (required for reward functionality)
-REACT_APP_SENDER_ADDRESS=0x742d35Cc6634C0532925a3b8D25c8c5c8A2B9E6D
-REACT_APP_SENDER_PRIVATE_KEY=0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+VITE_SENDER_ADDRESS=0x742d35Cc6634C0532925a3b8D25c8c5c8A2B9E6D
+VITE_SENDER_PRIVATE_KEY=0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
 
 # Network configuration
-REACT_APP_RPC_URL=https://mainnet.infura.io/v3/your-infura-key
-REACT_APP_NETWORK=mainnet
+VITE_RPC_URL=https://mainnet.infura.io/v3/your-infura-key
+VITE_NETWORK=mainnet
 
 # Token contract address (required for reward functionality)
-REACT_APP_TOKEN_CONTRACT_ADDRESS=0xA0b86a33E6441b6b07c2fE4c2b4B8B1d8B7a0F4c
+VITE_TOKEN_CONTRACT_ADDRESS=0xA0b86a33E6441b6b07c2fE4c2b4B8B1d8B7a0F4c
 
 # Wallet connection (REQUIRED for Dynamic Wallet Connection button)
 # Get from: https://cloud.reown.com/
 # The wallet selection modal will NOT open without this!
-REACT_APP_REOWN_PROJECT_ID=your-project-id-here
+VITE_REOWN_PROJECT_ID=your-project-id-here
 ```
 
 ### How It Works
 
-1. **Sender Wallet**: The `REACT_APP_SENDER_ADDRESS` should be a wallet that holds the reward tokens
-2. **Private Key**: The `REACT_APP_SENDER_PRIVATE_KEY` is used to sign transactions for token transfers
+1. **Sender Wallet**: The `VITE_SENDER_ADDRESS` should be a wallet that holds the reward tokens
+2. **Private Key**: The `VITE_SENDER_PRIVATE_KEY` is used to sign transactions for token transfers
 3. **RPC URL**: Used to connect to the Ethereum network for executing transactions
 4. **Recipient**: The reward tokens are sent to the connected user's wallet address
 
@@ -75,9 +75,9 @@ function App() {
     <RewardButton
       tokenAddress="0xA0b86a33E6441b6b07c2fE4c2b4B8B1d8B7a0F4c"
       rewardAmount={ethers.parseUnits('10', 6).toString()}
-      senderAddress={process.env.REACT_APP_SENDER_ADDRESS}
-      senderPrivateKey={process.env.REACT_APP_SENDER_PRIVATE_KEY}
-      rpcUrl={process.env.REACT_APP_RPC_URL}
+      senderAddress={import.meta.env.VITE_SENDER_ADDRESS}
+senderPrivateKey={import.meta.env.VITE_SENDER_PRIVATE_KEY}
+rpcUrl={import.meta.env.VITE_RPC_URL}
       tokenSymbol="CRT"
       requireConnection={true}
       onRewardClaimed={(txHash, amount) => {
@@ -99,7 +99,7 @@ function App() {
 
 If the "Dynamic Wallet Connection" button doesn't open the wallet selection modal:
 
-1. **Check Reown Project ID**: Ensure `REACT_APP_REOWN_PROJECT_ID` is set in your `.env` file
+1. **Check Reown Project ID**: Ensure `VITE_REOWN_PROJECT_ID` is set in your `.env` file
 2. **Get Project ID**: Visit [https://cloud.reown.com/](https://cloud.reown.com/) to create a project and get your Project ID
 3. **Restart Development Server**: After updating the `.env` file, restart your development server with `npm run dev`
 

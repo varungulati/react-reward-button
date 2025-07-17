@@ -14,7 +14,7 @@ const queryClient = new QueryClient();
 // Configure project ID - you can get this from https://cloud.reown.com/
 const projectId = rewardConfig.reownProjectId;
 
-// Network selection based on REACT_APP_NETWORK environment variable
+// Network selection based on VITE_NETWORK environment variable
 const getNetworkFromEnv = () => {
   const networkName = rewardConfig.network.toLowerCase();
   
@@ -38,7 +38,7 @@ const getNetworkFromEnv = () => {
 const selectedNetwork = getNetworkFromEnv();
 
 console.log('🌐 Network Configuration:');
-console.log('  REACT_APP_NETWORK:', rewardConfig.network);
+console.log('  VITE_NETWORK:', rewardConfig.network);
 console.log('  Selected Network:', selectedNetwork.name);
 console.log('  Chain ID:', selectedNetwork.id);
 console.log('  RPC URL:', rewardConfig.rpcUrl);
@@ -375,12 +375,12 @@ function App() {
                 </p>
                 <div className="code-block">
                   <pre>
-REACT_APP_SENDER_ADDRESS=0x742d35Cc6634C0532925a3b8D25c8c5c8A2B9E6D
-REACT_APP_SENDER_PRIVATE_KEY=0x0123456789abcdef...
-REACT_APP_NETWORK=polygon
-REACT_APP_RPC_URL=https://polygon-mainnet.infura.io/v3/your-key
-REACT_APP_TOKEN_CONTRACT_ADDRESS=0x0F35a94a4d...
-REACT_APP_REOWN_PROJECT_ID=your-project-id
+VITE_SENDER_ADDRESS=0x742d35Cc6634C0532925a3b8D25c8c5c8A2B9E6D
+VITE_SENDER_PRIVATE_KEY=0x0123456789abcdef...
+VITE_NETWORK=polygon
+VITE_RPC_URL=https://polygon-mainnet.infura.io/v3/your-key
+VITE_TOKEN_CONTRACT_ADDRESS=0x0F35a94a4d...
+VITE_REOWN_PROJECT_ID=your-project-id
                   </pre>
                 </div>
               </div>

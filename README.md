@@ -333,9 +333,9 @@ For development, you can use environment variables:
 
 ```bash
 # .env
-REACT_APP_REOWN_PROJECT_ID=your_project_id
-REACT_APP_NETWORK=mainnet
-REACT_APP_RPC_URL=https://mainnet.infura.io/v3/your_key
+VITE_REOWN_PROJECT_ID=your_project_id
+VITE_NETWORK=mainnet
+VITE_RPC_URL=https://mainnet.infura.io/v3/your_key
 ```
 
 ### Network Configuration
