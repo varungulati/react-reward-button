@@ -1,17 +1,14 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
-import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-  // Load environment variables from .env files (for local development)
-  const env = loadEnv(mode, process.cwd(), '')
-  
-  // Helper function to get env var from either .env files or system env (for fly.io)
+  const env = loadEnv(mode, process.cwd(), '')  // Load .env
+
   const getEnvVar = (name: string): string => {
-    return env[name] || process.env[name] || '';
+    return env[name] || process.env[name] || ''
   }
-  
+
   return {
     plugins: [react()],
     server: {
@@ -20,8 +17,6 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       global: 'globalThis',
-      // Vite automatically exposes VITE_ prefixed environment variables
-      // For deployment compatibility, we explicitly define them here
       'import.meta.env.VITE_SENDER_ADDRESS': JSON.stringify(getEnvVar('VITE_SENDER_ADDRESS')),
       'import.meta.env.VITE_SENDER_PRIVATE_KEY': JSON.stringify(getEnvVar('VITE_SENDER_PRIVATE_KEY')),
       'import.meta.env.VITE_TOKEN_CONTRACT_ADDRESS': JSON.stringify(getEnvVar('VITE_TOKEN_CONTRACT_ADDRESS')),
@@ -34,7 +29,7 @@ export default defineConfig(({ mode }) => {
         buffer: 'buffer',
         process: 'process/browser',
         util: 'util'
-      },
+      }
     },
     optimizeDeps: {
       include: ['buffer', 'process', 'util', 'ethers'],
@@ -59,4 +54,4 @@ export default defineConfig(({ mode }) => {
       }
     }
   }
-}) 
+})

@@ -3,18 +3,27 @@
 
 // Debug: Log environment variables
 console.log('🔍 Environment Variables Check:');
-console.log('VITE_SENDER_ADDRESS:', import.meta.env.VITE_SENDER_ADDRESS);
-console.log('VITE_SENDER_PRIVATE_KEY:', import.meta.env.VITE_SENDER_PRIVATE_KEY ? '[HIDDEN]' : 'undefined');
-console.log('VITE_TOKEN_CONTRACT_ADDRESS:', import.meta.env.VITE_TOKEN_CONTRACT_ADDRESS);
-console.log('VITE_RPC_URL:', import.meta.env.VITE_RPC_URL);
-console.log('VITE_REOWN_PROJECT_ID:', import.meta.env.VITE_REOWN_PROJECT_ID);
-console.log('VITE_NETWORK:', import.meta.env.VITE_NETWORK);
+console.log('VITE_SENDER_ADDRESS:', import.meta.env.VITE_SENDER_ADDRESS || process.env.VITE_SENDER_ADDRESS || 'Not Set');
+console.log('VITE_SENDER_PRIVATE_KEY:', import.meta.env.VITE_SENDER_PRIVATE_KEY ? '[HIDDEN]' : (process.env.VITE_SENDER_PRIVATE_KEY ? '[HIDDEN]' : 'Not Set'));
+console.log('VITE_TOKEN_CONTRACT_ADDRESS:', import.meta.env.VITE_TOKEN_CONTRACT_ADDRESS || process.env.VITE_TOKEN_CONTRACT_ADDRESS || 'Not Set');
+console.log('VITE_RPC_URL:', import.meta.env.VITE_RPC_URL || process.env.VITE_RPC_URL || 'Not Set');
+console.log('VITE_REOWN_PROJECT_ID:', import.meta.env.VITE_REOWN_PROJECT_ID || process.env.VITE_REOWN_PROJECT_ID || 'Not Set');
+console.log('VITE_NETWORK:', import.meta.env.VITE_NETWORK || process.env.VITE_NETWORK || 'Not Set');
 
-// Helper function to get required env var
+// Helper function to get required env var with fallback for deployment
 const getRequiredEnvVar = (name: string): string => {
-  const value = import.meta.env[name];
+  // Try import.meta.env first (for local development)
+  let value = import.meta.env[name];
+  
+  // Fallback to process.env for deployment scenarios (like fly.io)
+  if (!value && typeof process !== 'undefined' && process.env) {
+    value = process.env[name];
+  }
+  
   if (!value) {
-    throw new Error(`Required environment variable ${name} is not set! Check your .env file.`);
+    console.error(`❌ Required environment variable ${name} is not set!`);
+    console.error('Make sure to set it in your .env file or deployment environment.');
+    throw new Error(`Required environment variable ${name} is not set! Check your .env file or deployment environment.`);
   }
   return value;
 };

@@ -1,20 +1,9 @@
-# fly.toml app configuration file generated for react-reward-button-demo on 2025-07-17T11:39:03+05:30
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
+# fly.toml app configuration file for react-reward-button-demo
 
 app = 'react-reward-button-demo'
 primary_region = 'sjc'
 
 [build]
-
-[build.args]
-  VITE_SENDER_ADDRESS = "${VITE_SENDER_ADDRESS}"
-  VITE_SENDER_PRIVATE_KEY = "${VITE_SENDER_PRIVATE_KEY}"
-  VITE_TOKEN_CONTRACT_ADDRESS = "${VITE_TOKEN_CONTRACT_ADDRESS}"
-  VITE_NETWORK = "${VITE_NETWORK}"
-  VITE_RPC_URL = "${VITE_RPC_URL}"
-  VITE_REOWN_PROJECT_ID = "${VITE_REOWN_PROJECT_ID}"
 
 [http_service]
   internal_port = 80
