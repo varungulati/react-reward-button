@@ -8,6 +8,14 @@ primary_region = 'sjc'
 
 [build]
 
+[build.args]
+  VITE_SENDER_ADDRESS = "${VITE_SENDER_ADDRESS}"
+  VITE_SENDER_PRIVATE_KEY = "${VITE_SENDER_PRIVATE_KEY}"
+  VITE_TOKEN_CONTRACT_ADDRESS = "${VITE_TOKEN_CONTRACT_ADDRESS}"
+  VITE_NETWORK = "${VITE_NETWORK}"
+  VITE_RPC_URL = "${VITE_RPC_URL}"
+  VITE_REOWN_PROJECT_ID = "${VITE_REOWN_PROJECT_ID}"
+
 [http_service]
   internal_port = 80
   force_https = true
