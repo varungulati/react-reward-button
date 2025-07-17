@@ -3,12 +3,12 @@
 
 // Debug: Log environment variables
 console.log('🔍 Environment Variables Check:');
-console.log('VITE_SENDER_ADDRESS:', import.meta.env.VITE_SENDER_ADDRESS || process.env.VITE_SENDER_ADDRESS || 'Not Set');
+console.log('VITE_SENDER_ADDRESS:', (import.meta.env.VITE_SENDER_ADDRESS || process.env.VITE_SENDER_ADDRESS || 'Not Set').slice(0, 6) + '...');
 console.log('VITE_SENDER_PRIVATE_KEY:', import.meta.env.VITE_SENDER_PRIVATE_KEY ? '[HIDDEN]' : (process.env.VITE_SENDER_PRIVATE_KEY ? '[HIDDEN]' : 'Not Set'));
-console.log('VITE_TOKEN_CONTRACT_ADDRESS:', import.meta.env.VITE_TOKEN_CONTRACT_ADDRESS || process.env.VITE_TOKEN_CONTRACT_ADDRESS || 'Not Set');
-console.log('VITE_RPC_URL:', import.meta.env.VITE_RPC_URL || process.env.VITE_RPC_URL || 'Not Set');
-console.log('VITE_REOWN_PROJECT_ID:', import.meta.env.VITE_REOWN_PROJECT_ID || process.env.VITE_REOWN_PROJECT_ID || 'Not Set');
-console.log('VITE_NETWORK:', import.meta.env.VITE_NETWORK || process.env.VITE_NETWORK || 'Not Set');
+console.log('VITE_TOKEN_CONTRACT_ADDRESS:', (import.meta.env.VITE_TOKEN_CONTRACT_ADDRESS || process.env.VITE_TOKEN_CONTRACT_ADDRESS || 'Not Set').slice(0, 6) + '...');
+console.log('VITE_RPC_URL:', (import.meta.env.VITE_RPC_URL || process.env.VITE_RPC_URL || 'Not Set').slice(0, 20) + '...');
+console.log('VITE_REOWN_PROJECT_ID:', (import.meta.env.VITE_REOWN_PROJECT_ID || process.env.VITE_REOWN_PROJECT_ID || 'Not Set').slice(0, 6) + '...');
+console.log('VITE_NETWORK:', (import.meta.env.VITE_NETWORK || process.env.VITE_NETWORK || 'Not Set').slice(0, 6) + '...');
 
 // Helper function to get required env var with fallback for deployment
 const getRequiredEnvVar = (name: string): string => {
