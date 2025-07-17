@@ -117,3 +117,7 @@ For testing purposes, you can use:
 - **Mock Tokens**: Deploy test ERC20 tokens for testing
 
 Make sure to use testnet tokens and never use real funds during development. 
+
+## Demo
+
+Try the demo here: [React Reward Button Demo](https://react-reward-button-demo.fly.dev/) 
