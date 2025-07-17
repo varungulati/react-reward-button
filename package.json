@@ -41,7 +41,7 @@
   "bugs": {
     "url": "https://github.com/varungulati/react-reward-button/issues"
   },
-  "homepage": "https://github.com/varungulati/react-reward-button#readme",
+  "homepage": "https://react-reward-button-demo.fly.dev/",
   "peerDependencies": {
     "@reown/appkit": "^1.0.0",
     "@reown/appkit-adapter-wagmi": "^1.0.0",
