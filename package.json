@@ -1,6 +1,6 @@
 {
   "name": "react-reward-button",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A React component that provides a reward button with Ethereum token rewards",
   "type": "module",
   "main": "dist/index.js",
