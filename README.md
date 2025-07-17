@@ -28,6 +28,11 @@ React Reward Button is a drop-in, beautifully styled button powered by shadcn/ui
 6. **🧩 Plug-and-Play Integration**  
    Drop it into any React project like a regular button. Add reward props, and you're done — no backend required unless you want one.
 
+## Demo
+
+Try the demo here: [React Reward Button Demo](https://react-reward-button-demo.fly.dev/)
+
+
 ## Features
 
 - 🌐 **Web3 Integration**: Built with wagmi and AppKit for modern Web3 functionality

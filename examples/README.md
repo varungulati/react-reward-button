@@ -2,6 +2,10 @@
 
 This directory contains examples demonstrating how to use the React Reward Button component with wallet connection and token transfers.
 
+## Demo
+
+Try the demo here: [React Reward Button Demo](https://react-reward-button-demo.fly.dev/)
+
 ## Environment Setup
 
 ### Required Environment Variables
@@ -10,15 +14,15 @@ Create a `.env` file in this directory with the following variables:
 
 ```bash
 # Sender wallet configuration (required for reward functionality)
-VITE_SENDER_ADDRESS=0x742d35Cc6634C0532925a3b8D25c8c5c8A2B9E6D
-VITE_SENDER_PRIVATE_KEY=0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+VITE_SENDER_ADDRESS=0x742d35CxxxxxC0532925a3b8D25cxxxxxA2B9E6D
+VITE_SENDER_PRIVATE_KEY=0x0123xxxx89abcdef0123456789abcdef0123456789abcdef0123456789abcdef
 
 # Network configuration
 VITE_RPC_URL=https://mainnet.infura.io/v3/your-infura-key
 VITE_NETWORK=mainnet
 
 # Token contract address (required for reward functionality)
-VITE_TOKEN_CONTRACT_ADDRESS=0xA0b86a33E6441b6b07c2fE4c2b4B8B1d8B7a0F4c
+VITE_TOKEN_CONTRACT_ADDRESS=0xAxxxxa33E6441b6b07c2fxxxxx4B8B1d8B7a0F4c
 
 # Wallet connection (REQUIRED for Dynamic Wallet Connection button)
 # Get from: https://cloud.reown.com/
@@ -73,7 +77,7 @@ import { ethers } from 'ethers';
 function App() {
   return (
     <RewardButton
-      tokenAddress="0xA0b86a33E6441b6b07c2fE4c2b4B8B1d8B7a0F4c"
+      tokenAddress="0xA0b86xxxx6441b6b0xxxxE4c2b4B8B1d8B7axxxx"
       rewardAmount={ethers.parseUnits('10', 6).toString()}
       senderAddress={import.meta.env.VITE_SENDER_ADDRESS}
 senderPrivateKey={import.meta.env.VITE_SENDER_PRIVATE_KEY}
@@ -118,6 +122,6 @@ For testing purposes, you can use:
 
 Make sure to use testnet tokens and never use real funds during development. 
 
-## Demo
+## Features
 
-Try the demo here: [React Reward Button Demo](https://react-reward-button-demo.fly.dev/) 
+``` 
