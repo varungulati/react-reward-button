@@ -45,6 +45,8 @@ Try the demo here: [React Reward Button Demo](https://react-reward-button-demo.f
 - ♿ **Accessible**: Built with accessibility standards in mind
 - 🚀 **Performance**: Optimized for production use
 
+✅ AI-friendly: Works great with ChatGPT/Cursor/GitHub Copilot
+
 ## Installation
 
 ```bash
